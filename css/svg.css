@@ -1,0 +1,48 @@
+text {
+  text-anchor:       middle;
+  dominant-baseline: central;
+  font-size: 12pt;
+}
+
+text.type {
+  font-weight: bold;
+}
+text.desc {
+  font-size: 10pt;
+}
+
+a {
+  fill: blue;
+  text-decoration: underline;
+}
+
+.frame {
+  stroke-width: 1pt;
+  fill:         none;
+}
+rect.title  { opacity: 0.2; }
+
+/* ----------------- Variable ---------------- */
+
+.variable text.type { fill: #fff; }
+.variable rect        { fill:   #60A917; }
+.variable rect.title  { fill:   #2D7600; }
+.variable .frame      { stroke: #2D7600; }
+
+/* ----------------- Property ---------------- */
+
+.property rect        { fill:   #E1D5E7; }
+.property rect.title  { fill:   #B266FF; }
+.property .frame      { stroke: #B266FF; }
+
+/* ----------------- Entity ------------------ */
+
+.entity rect        { fill:   #DAE8FC; }
+.entity rect.title  { fill:   #6C8EBF; }
+.entity .frame      { stroke: #6C8EBF; }
+
+/* ---------------- Constraint --------------- */
+
+.constraint rect        { fill:   #F8CECC; }
+.constraint rect.title  { fill:   #B85450; }
+.constraint .frame      { stroke: #B85450; }

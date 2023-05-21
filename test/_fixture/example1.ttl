@@ -1,0 +1,17 @@
+@base           <http://example.org/> .
+@prefix ex:     <http://example.org/> .
+@prefix iop:    <https://w3id.org/iadopt/ont/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix om:     <http://www.ontology-of-units-of-measure.org/resource/om-2/> .
+
+ex:TreeHeight a iop:Variable ;
+              rdfs:label              "Height of a tree"@en ;
+              iop:hasObjectOfInterest ex:Tree ;
+              iop:hasProperty         om:Height .
+
+ex:Tree a iop:Entity ;
+        rdfs:label "a biological tree"@en .
+
+om:Height a iop:Property ;
+          rdfs:label "Height"@en .

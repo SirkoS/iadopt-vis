@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>I-Adopt Variable Visualizer</title>
+    <link href="./css/interface.css" rel="stylesheet" />
+    <link href="./css/svg.css" rel="stylesheet" />
+  </head>
+  <body>
+
+    <textarea id="input">
+      @base           <http://example.org/> .
+      @prefix ex:     <http://example.org/> .
+      @prefix iop:    <https://w3id.org/iadopt/ont/> .
+      @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+      @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+      @prefix om:     <http://www.ontology-of-units-of-measure.org/resource/om-2/> .
+
+      ex:TreeHeight a iop:Variable ;
+                    rdfs:label              "Height of a tree"@en ;
+                    iop:hasObjectOfInterest ex:Tree ;
+                    iop:hasProperty         om:Height .
+
+      ex:Tree a iop:Entity ;
+              rdfs:label "a biological tree"@en .
+
+      om:Height a iop:Property ;
+                rdfs:label "Height"@en .
+    </textarea>
+    <br>
+    <button id="visualize">Visualize!</button>
+
+    <pre id="dev"></pre>
+    <div id="svg"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

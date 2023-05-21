@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/Schema.json",
+  "title": "I-Adopt Variable",
+  "description": "JSON Schema for a parsed I-Adopt Variable",
+
+  "definitions": {
+    "label": {
+      "type":  "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type":   { "enum": [ "literal" ],  "type": "string" },
+          "value":  {                         "type": "string" }
+        }
+      }
+    },
+    "entity": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type":     { "enum": [ "iri", "literal" ],              "type": "string" },
+          "value":    {                                            "type": "string"      },
+          "shortIri": { "description": "prefixed IRI if possible", "type": "string" },
+          "label":    {                                            "$ref": "#/definitions/label" }
+        }
+      }
+    }
+  },
+
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "iri":        { "description": "IRI of the Variable",         "type": "string" },
+    "shortIri":   { "description": "prefixed IRI if possible",    "type": "string" },
+    "label":      { "description": "label of the Variable",       "$ref": "#/definitions/label" },
+    "comment":    { "description": "description of the Variable", "$ref": "#/definitions/label" },
+
+    "constraint": { "description": "iop:Constraint",              "$ref": "#/definitions/entity" },
+    "context":    { "description": "iop:ContextObject",           "$ref": "#/definitions/entity" },
+    "matrix":     { "description": "iop:Matrix",                  "$ref": "#/definitions/entity" },
+    "prop":       { "description": "iop:Property",                "$ref": "#/definitions/entity" },
+    "ooi":        { "description": "iop:ObjectOfInterest",        "$ref": "#/definitions/entity" }
+  }
+}

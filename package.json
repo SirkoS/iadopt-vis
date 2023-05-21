@@ -1,0 +1,25 @@
+{
+  "name": "iadopt-vis",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Visualize IAdopt Variables",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "mocha test/**/*.js"
+  },
+  "devDependencies": {
+    "vite": "^4.3.2",
+    "ajv": "^8.12.0",
+    "chai": "^4.3.7",
+    "chai-json-schema-ajv": "^5.2.4",
+    "eslint": "^8.36.0",
+    "eslint-plugin-mocha": "^10.1.0",
+    "mocha": "^10.2.0"
+  },
+  "dependencies": {
+    "rdflib": "^2.2.31"
+  }
+}
