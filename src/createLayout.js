@@ -1,6 +1,14 @@
 import Cfg from './config.js';
 import calcBoxWidth from './createLayout/equalWidth.js';
 
+// labels for arrows connecting Variable and the direct properties
+const ARROW_LABELS = {
+  prop:     'hasProperty',
+  matrix:   'hasMatrix',
+  context:  'hasContextObject',
+  ooi:      'hasObjectOfInterest',
+};
+
 /**
  * do the layout for a single Variable
  * @param   {object} data   Variable description
@@ -14,15 +22,15 @@ export default function createLayout( data ) {
     boxes:  []
   };
 
-  let box;
+  let box, arrow;
 
   // memorize the starting y-coordinate for each box
   let startY = Cfg.layout.margin;
 
   // the Variable itself
-  box = getBox( 'Variable', data, startY );
-  result.boxes.push( box );
-  startY += box.height;
+  const variableBox = getBox( 'Variable', data, startY );
+  result.boxes.push( variableBox );
+  startY += variableBox.height;
 
   // second row of elements
   startY += Cfg.layout.entity.vertMargin;
@@ -30,11 +38,27 @@ export default function createLayout( data ) {
   // calculate widths for each box
   calcBoxWidth([ ... data.matrix, ... data.ooi, ... data.context, ... data.prop ]);
 
-  // all single valued components
+  // entries for all single valued components
   for( const key of [ 'prop', 'matrix', 'ooi' ] ) {
     if( (key in data) && (data[key].length > 0) ) {
+
+      // add the box
       box = getBox( key == 'prop' ? 'Property' : 'Entity', data[key][0], startY );
       result.boxes.push( box );
+
+      // add the corresponding arrow
+      arrow = {
+        text: ARROW_LABELS[ key ],
+        path: [
+          { x: box.x + 0.5 * box.width, y: variableBox.y + variableBox.height },
+          { x: box.x + 0.5 * box.width, y: box.y - 6 },
+        ],
+        x:    box.x + 0.5 * box.width,
+        y:    variableBox.y + variableBox.height + 0.5 * (box.y - variableBox.y - variableBox.height),
+        type: key,
+      };
+      result.arrows.push( arrow );
+
     }
   }
 

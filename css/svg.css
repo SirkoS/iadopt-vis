@@ -46,3 +46,13 @@ rect.title  { opacity: 0.2; }
 .constraint rect        { fill:   #F8CECC; }
 .constraint rect.title  { fill:   #B85450; }
 .constraint .frame      { stroke: #B85450; }
+
+/* ------------------ Arrows ----------------- */
+
+.arrow path {
+  stroke: black;
+}
+.arrow text {
+  font-size: 10pt;
+  font-style: italic;
+}
