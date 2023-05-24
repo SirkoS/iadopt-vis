@@ -21,7 +21,7 @@ export default {
       textMargin: 10,
 
       // vertical distance between two boxes
-      vertMargin: 50,
+      vertMargin: 80,
 
       // horzontal distance between two boxes
       horMargin: 20,
