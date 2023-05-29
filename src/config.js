@@ -23,8 +23,11 @@ export default {
       // vertical distance between two boxes
       vertMargin: 80,
 
-      // horzontal distance between two boxes
+      // horizontal distance between two boxes
       horMargin: 20,
+
+      // minimal distance between text and the borders of the corresponding box
+      minPadding: 20,
 
     }
 

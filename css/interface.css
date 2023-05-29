@@ -14,3 +14,10 @@ button {
   margin: 1em;
   font-size: 150%;
 }
+
+#helper {
+  visibility: hidden;
+  position: fixed;
+  top: -100;
+  left: -100;
+}

@@ -1,5 +1,5 @@
 import Cfg from './config.js';
-import calcBoxWidth from './createLayout/equalWidth.js';
+import calcBoxWidth from './createLayout/proportionalWidth.js';
 
 // labels for arrows connecting Variable and the direct properties
 const ARROW_LABELS = {

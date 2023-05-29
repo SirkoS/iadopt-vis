@@ -23,7 +23,8 @@
                     iop:hasProperty         om:Height .
 
       ex:Tree a iop:Entity ;
-              rdfs:label "a biological tree"@en .
+              rdfs:label "a biological tree"@en ;
+              rdfs:comment "this is a usual tree as opposed to a binary tree from computer science" .
 
       om:Height a iop:Property ;
                 rdfs:label "Height"@en .
@@ -33,6 +34,9 @@
 
     <pre id="dev"></pre>
     <div id="svg"></div>
+    <div id="helper">
+      <svg><text></text></svg>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

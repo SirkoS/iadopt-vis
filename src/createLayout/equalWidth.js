@@ -1,10 +1,11 @@
 import Cfg from '../config.js';
+import getTextDims from './getTextDims.js';
 
 /**
  * horizontally layout for a given set of boxes
  *
  * equal-width-layout:
- * * all boxes have the same width
+ * - all boxes have the same width
  *
  * @param   {Array.<object>}  boxes   boxes to calculate the width for
  * @returns {Array.<object>}          modified boxes including width statements
