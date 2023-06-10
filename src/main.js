@@ -1,6 +1,12 @@
+import 'bootstrap/dist/css/bootstrap.css';
+import '../css/interface.css';
+import '../css/svg.css';
+
 import draw from './draw.js';
 import extract from './extract.js';
 import createLayout from './createLayout.js';
+
+import * as bootstrap from 'bootstrap';
 
 document.querySelector( '#visualize' )
   .addEventListener( 'click', async () => {
@@ -19,6 +25,9 @@ document.querySelector( '#visualize' )
 
       // draw it
       await draw( document.querySelector( '#svg' ), layout );
+
+      // enable export button
+      document.querySelector( '#export' ).classList.remove( 'invisible' );
 
 
     } catch( e ) {

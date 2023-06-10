@@ -1,42 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>I-Adopt Variable Visualizer</title>
-    <link href="./css/interface.css" rel="stylesheet" />
-    <link href="./css/svg.css" rel="stylesheet" />
-  </head>
-  <body>
 
-    <textarea id="input">
-      @base           <http://example.org/> .
-      @prefix ex:     <http://example.org/> .
-      @prefix iop:    <https://w3id.org/iadopt/ont/> .
-      @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
-      @prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-      @prefix om:     <http://www.ontology-of-units-of-measure.org/resource/om-2/> .
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I-Adopt Variable Visualizer</title>
+</head>
 
-      ex:TreeHeight a iop:Variable ;
-                    rdfs:label              "Height of a tree"@en ;
-                    iop:hasObjectOfInterest ex:Tree ;
-                    iop:hasProperty         om:Height .
+<body data-bs-theme="dark">
+  <h1>I-ADOPT Visualiser</h1>
 
-      ex:Tree a iop:Entity ;
-              rdfs:label "a biological tree"@en ;
-              rdfs:comment "this is a usual tree as opposed to a binary tree from computer science" .
+  <div class="container-xl">
 
-      om:Height a iop:Property ;
-                rdfs:label "Height"@en .
-    </textarea>
-    <br>
-    <button id="visualize">Visualize!</button>
+    <nav>
+      <div class="nav nav-tabs justify-content-center mb-3" role="tablist">
+        <button class="nav-link active" id="rdf-tab" data-bs-toggle="tab" data-bs-target="#rdf-tab-pane" type="button"
+          role="tab" aria-controls="rdf-tab-pane" aria-selected="true">RDF</button>
+        <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url-tab-pane" type="button"
+          role="tab" aria-controls="url-tab-pane" aria-selected="false" disabled>URL</button>
+        <button class="nav-link" id="sparql-tab" data-bs-toggle="tab" data-bs-target="#sparql-tab-pane" type="button"
+          role="tab" aria-controls="sparql-tab-pane" aria-selected="false" disabled>SPARQL
+          Endpoint</button>
+      </div>
+    </nav>
+
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="rdf-tab-pane" role="tabpanel" aria-labelledby="rdf-tab" tabindex="0">
+
+        <textarea id="input" class="font-monospace">
+@base           <http://example.org/> .
+@prefix ex:     <http://example.org/> .
+@prefix iop:    <https://w3id.org/iadopt/ont/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix om:     <http://www.ontology-of-units-of-measure.org/resource/om-2/> .
+
+ex:TreeHeight a iop:Variable ;
+              rdfs:label              "Height of a tree"@en ;
+              iop:hasObjectOfInterest ex:Tree ;
+              iop:hasProperty         om:Height .
+
+ex:Tree a iop:Entity ;
+        rdfs:label "a biological tree"@en ;
+        rdfs:comment "this is a usual tree as opposed to a binary tree from computer science" .
+
+om:Height a iop:Property ;
+          rdfs:label "Height"@en .
+          </textarea>
+
+      </div>
+      <div class="tab-pane fade" id="url-tab-pane" role="tabpanel" aria-labelledby="url-tab" tabindex="0">
+        tbd
+      </div>
+      <div class="tab-pane fade" id="sparql-tab-pane" role="tabpanel" aria-labelledby="sparql-tab" tabindex="0">
+        tbd
+      </div>
+    </div>
+    <button id="visualize" class="btn btn-primary">Visualize!</button>
 
     <pre id="dev"></pre>
-    <div id="svg"></div>
+    <div class="container-lg" id="svg"></div>
+    <div class="dropdown invisible" id="export">
+      <button disabled class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Export Visualization
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#" data-format="svg">SVG</a></li>
+        <li><a class="dropdown-item" href="#" data-format="png">PNG</a></li>
+      </ul>
+    </div>
+    <div>
+    </div>
     <div id="helper">
       <svg><text></text></svg>
     </div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>

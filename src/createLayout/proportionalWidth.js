@@ -34,7 +34,7 @@ export default function calcBoxWidth( boxes ) {
   }
 
   // assign the final width to all boxes
-  let leftStart = 0;
+  let leftStart = Cfg.layout.margin;
   for( let i=0; i<dynBoxes.length; i++ ) {
 
     dynBoxes[i].box.x     = leftStart;

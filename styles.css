@@ -1,0 +1,6 @@
+/* Import all of Bootstrap's CSS */
+@import "bootstrap/css/bootstrap";
+
+/* custom styles */
+@import "./css/interface.css";
+@import "./css/svg.css";
