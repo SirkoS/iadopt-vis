@@ -1,5 +1,6 @@
 import Cfg from './config.js';
 import calcBoxWidth from './createLayout/proportionalWidth.js';
+import getTextDims from './createLayout/getTextDims.js';
 
 // labels for arrows connecting Variable and the direct properties
 const ARROW_LABELS = {
@@ -55,6 +56,7 @@ export default function createLayout( data ) {
         ],
         x:    box.x + 0.5 * box.width,
         y:    variableBox.y + variableBox.height + 0.5 * (box.y - variableBox.y - variableBox.height),
+        dim:  getTextDims( ARROW_LABELS[ key ] ),
         type: key,
       };
       result.arrows.push( arrow );

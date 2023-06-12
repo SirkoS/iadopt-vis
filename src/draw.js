@@ -39,6 +39,14 @@ export default function draw( div, layout ) {
   <path d="M 1,1 l 7,4 l -7,4 2,-4 z" style="fill: black"/>
 </marker>
   `;
+  const arrowMask = createElement( 'mask', {
+    id: 'arrowMask',
+    maskUnits: 'userSpaceOnUse',
+  } );
+  arrowMask.innerHTML = `
+    <rect x="0" y="0" width="${Cfg.layout.width}" height="${height}" />
+  `;
+  defs.appendChild( arrowMask );
   svg.appendChild( defs );
 
   // draw all arrows
@@ -63,6 +71,13 @@ export default function draw( div, layout ) {
     });
     textEl.innerHTML = arr.text;
     container.appendChild( textEl );
+
+    // arrow cutout
+    // (so text does not overlap with arrow stroke)
+    arrowMask.appendChild( createElement( 'path', {
+      d: `M ${arr.x - 0.5*arr.dim.width},${arr.y - 0.5*arr.dim.height}
+          l 0,${arr.dim.height} ${arr.dim.width},0 0,-${arr.dim.height} Z`,
+    }));
 
     // add to DOM
     svg.appendChild( container );

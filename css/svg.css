@@ -52,8 +52,17 @@ rect.title  { opacity: 0.2; }
 
 .arrow path {
   stroke: black;
+  mask:   url(#arrowMask);
 }
 .arrow text {
   font-size: 10pt;
   font-style: italic;
+}
+
+/* cut outs for arrows */
+mask path {
+  fill: #000;
+}
+mask rect {
+  fill: #fff;
 }

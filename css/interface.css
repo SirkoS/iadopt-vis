@@ -2,7 +2,8 @@ body {
   text-align: center;
 }
 svg {
-  width: 80%;
+  width: 60%;
+  min-width: 600px;
   background-color: RGBA(248, 249, 250, var(--bs-bg-opacity, 1));
   border-radius: 5px;
 }
