@@ -31,7 +31,7 @@ describe( 'extract', function() {
     const labels = {
       variable: 'Height of a tree',
       ooi:      'a biological tree',
-      prop:     'height',
+      prop:     'Height',
     };
     assert.include( variable.label?.map( (el) => el.value ), labels.variable, 'should contain the correct label for "variable"' );
     for( const key of [ 'ooi', 'prop' ] ) {
