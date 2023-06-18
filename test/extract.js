@@ -1,5 +1,5 @@
 import extract from '../src/extract.js';
-import VariableSchema from './schema/variable.schema.json' assert { type: "json" };
+import VariableSchema from './_schema/variable.schema.json' assert { type: "json" };
 import { assert } from 'chai';
 import { promises as Fs } from 'fs';
 
