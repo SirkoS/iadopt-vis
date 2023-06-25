@@ -119,6 +119,14 @@ export default function draw( div, layout ) {
       class:  'frame',
     }) );
 
+    // separator between IRI and remaining description if necessary
+    if( box.descSeparator ) {
+      container.appendChild( createElement( 'path', {
+        d:      `M ${box.x},${box.descSeparator} l ${box.width},0`,
+        class:  'frame light',
+      }) );
+    }
+
 
     // any attached text
     for( const text of box.texts ) {

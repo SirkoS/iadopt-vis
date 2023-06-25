@@ -1,5 +1,5 @@
 import Cfg from './config.js';
-import calcBoxWidth from './createLayout/equalWidth.js';
+import calcBoxWidth from './createLayout/proportionalWidth.js';
 import getTextDims from './createLayout/getTextDims.js';
 import splitText from './createLayout/splitText.js';
 
@@ -89,10 +89,26 @@ function getBox( type, data, initialY ) {
 
   // prepare description texts
   const lines = [];
-  let startY = initialY + 2.5 * Cfg.layout.entity.header.height;;
+  let startY = initialY + 2.5 * Cfg.layout.entity.header.height;
+
+  // append prefixed IRI, if available
+  if( data.shortIri ) {
+    lines.push({
+      x: boxCenter,
+      y: startY,
+      text:       data.shortIri,
+      className:  'desc',
+      link:       data.iri ?? data.value,
+    });
+    startY += Cfg.layout.lineHeight;
+  }
+  let descSeparator = startY;
 
   // append description, if available
   if( data.comment && (data.comment.length > 0) ) {
+
+    // set apart from the above text
+    startY +=  + Cfg.layout.entity.textMargin;
 
     // split description until it fits the box width
     let commentWidth = getTextDims( data.comment[0].value );
@@ -122,33 +138,21 @@ function getBox( type, data, initialY ) {
       startY += Cfg.layout.lineHeight;
     }
 
-    startY += Cfg.layout.entity.textMargin;
   }
 
-  // append prefixed IRI, if available
-  if( data.shortIri ) {
-    lines.push({
-      x: boxCenter,
-      y: startY,
-      text:       data.shortIri,
-      className:  'desc',
-      link:       data.iri ?? data.value,
-    });
-    startY += Cfg.layout.lineHeight;
-  }
-
-  // overall height of the variable box
-  const height = Cfg.layout.entity.header.height * 2
-      + Cfg.layout.entity.textMargin * 2
-      + lines.length * Cfg.layout.lineHeight;
+  // do we need the separator between IRI and an additional description?
+  descSeparator = data.shortIri && data.comment && (data.comment.length > 0)
+    ? descSeparator
+    : null;
 
   // base entry for the box
   const box = {
-    x:      data.x ?? Cfg.layout.margin,
-    width:  boxWidth,
-    y:      initialY,
-    height: startY - initialY + Cfg.layout.entity.textMargin,
-    className: type.toLowerCase(),
+    x:              data.x ?? Cfg.layout.margin,
+    width:          boxWidth,
+    y:              initialY,
+    height:         startY - initialY,
+    descSeparator:  descSeparator,
+    className:      type.toLowerCase(),
     texts: [
       // box header (type)
       {

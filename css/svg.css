@@ -25,7 +25,12 @@ text.desc a {
   stroke-width: 1pt;
   fill:         none;
 }
-rect.title  { opacity: 0.2; }
+.frame.light {
+  opacity: 0.4;
+}
+rect.title {
+  opacity: 0.2;
+}
 
 /* ----------------- Variable ---------------- */
 

@@ -18,7 +18,7 @@ export default {
       },
 
       // additional margin for texts (description / url)
-      textMargin: 10,
+      textMargin: 15,
 
       // vertical distance between two boxes
       vertMargin: 80,
