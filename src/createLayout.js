@@ -1,6 +1,7 @@
 import Cfg from './config.js';
-import calcBoxWidth from './createLayout/proportionalWidth.js';
+import calcBoxWidth from './createLayout/equalWidth.js';
 import getTextDims from './createLayout/getTextDims.js';
+import splitText from './createLayout/splitText.js';
 
 // labels for arrows connecting Variable and the direct properties
 const ARROW_LABELS = {
@@ -71,30 +72,69 @@ export default function createLayout( data ) {
 
 /**
  * gather the full layout-data for a box
- * @param   {string} type     type of the box
- * @param   {object} data     description
- * @param   {number} startY   starting y-coordinate for this level of boxes
- * @returns {object} layout data
+ * @param   {string} type       type of the box
+ * @param   {object} data       description
+ * @param   {number} initialY   starting y-coordinate for this level of boxes
+ * @returns {object}            layout data
  */
-function getBox( type, data, startY ) {
+function getBox( type, data, initialY ) {
 
   // center of the box as point of alignment for texts
   // default is based on entire width of visualization
   const boxCenter = (data.x ?? Cfg.layout.margin)
     + 0.5 * (data.width ?? (Cfg.layout.width - 2 * Cfg.layout.margin));
 
+  // width of the box is either given or uses all available space
+  const boxWidth = data.width ?? (Cfg.layout.width - 2 * Cfg.layout.margin);
+
   // prepare description texts
   const lines = [];
+  let startY = initialY + 2.5 * Cfg.layout.entity.header.height;;
 
-  // append additional description lines, if applicable
+  // append description, if available
+  if( data.comment && (data.comment.length > 0) ) {
+
+    // split description until it fits the box width
+    let commentWidth = getTextDims( data.comment[0].value );
+    let comment = [ data.comment[0].value ];
+    const maxWidth = boxWidth - 2 * Cfg.layout.entity.textMargin;
+    while( commentWidth.width > maxWidth ) {
+
+      // next split
+      comment = splitText( data.comment[0].value, comment.length + 1 );
+
+      // max line length
+      commentWidth = comment.reduce( (max, el) => {
+        const dims = getTextDims( el );
+        return dims.width > max.width ? dims : max;
+      }, { width: 0 } );
+
+    }
+
+    // add all lines of the description
+    for( const line of comment ) {
+      lines.push({
+        x: boxCenter,
+        y: startY,
+        text:       line,
+        className:  'desc',
+      });
+      startY += Cfg.layout.lineHeight;
+    }
+
+    startY += Cfg.layout.entity.textMargin;
+  }
+
+  // append prefixed IRI, if available
   if( data.shortIri ) {
     lines.push({
       x: boxCenter,
-      y: startY + 2.5 * Cfg.layout.entity.header.height,
+      y: startY,
       text:       data.shortIri,
       className:  'desc',
       link:       data.iri ?? data.value,
     });
+    startY += Cfg.layout.lineHeight;
   }
 
   // overall height of the variable box
@@ -105,22 +145,22 @@ function getBox( type, data, startY ) {
   // base entry for the box
   const box = {
     x:      data.x ?? Cfg.layout.margin,
-    width:  data.width ?? (Cfg.layout.width - 2 * Cfg.layout.margin),
-    y:      startY,
-    height: height,
+    width:  boxWidth,
+    y:      initialY,
+    height: startY - initialY + Cfg.layout.entity.textMargin,
     className: type.toLowerCase(),
     texts: [
       // box header (type)
       {
         x: boxCenter,
-        y: startY + Cfg.layout.entity.header.height * 0.5,
+        y: initialY + Cfg.layout.entity.header.height * 0.5,
         text: type,
         className: 'type',
       },
       // box header (name of entity)
       {
         x: boxCenter,
-        y: startY + Cfg.layout.entity.header.height * 1.5,
+        y: initialY + Cfg.layout.entity.header.height * 1.5,
         text: data.label?.[0]?.value,
         className: 'title',
       },

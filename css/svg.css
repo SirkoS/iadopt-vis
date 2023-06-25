@@ -10,11 +10,15 @@ text.type {
 }
 text.desc {
   font-size: 10pt;
+  font-style: italic;
 }
 
 a {
   fill: blue;
   text-decoration: underline;
+}
+text.desc a {
+  font-style: normal;
 }
 
 .frame {

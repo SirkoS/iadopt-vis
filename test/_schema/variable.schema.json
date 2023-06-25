@@ -25,7 +25,8 @@
           "type":     { "enum": [ "iri", "literal" ],              "type": "string" },
           "value":    {                                            "type": "string"      },
           "shortIri": { "description": "prefixed IRI if possible", "type": "string" },
-          "label":    {                                            "$ref": "#/definitions/label" }
+          "label":    {                                            "$ref": "#/definitions/label" },
+          "comment":  {                                            "$ref": "#/definitions/label" }
         }
       }
     }

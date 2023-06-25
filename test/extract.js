@@ -3,7 +3,7 @@ import VariableSchema from './_schema/variable.schema.json' assert { type: "json
 import { assert } from 'chai';
 import { promises as Fs } from 'fs';
 
-describe( 'extract', function() {
+describe.only( 'extract', function() {
 
   const fixtures = {};
   before( async function(){
@@ -41,6 +41,7 @@ describe( 'extract', function() {
 
     // prefixed IRIs
     assert.equal( )
+
   } );
 
 });

@@ -15,6 +15,10 @@ const PROP_MAP = {
   context:    [ NS.iop( 'hasContextObject' ) ],
   constraint: [ NS.iop( 'hasConstraint' ) ],
 };
+const LITERAL_PROP_MAP = {
+  label:    PROP_MAP.label,
+  comment:  PROP_MAP.comment,
+};
 
 /**
  * Parse a TTL representation of the Variable to the internal object format
@@ -72,21 +76,22 @@ export default async function extract( content ) {
         // for use within RDFlib this needs to be a named node
         const instanceNode = Rdflib.sym( instance.value );
 
-        // try to get a label
-        for( const prop of PROP_MAP.label ) {
+        // try to get labels and comments
+        for( const [ key, props ] of Object.entries( LITERAL_PROP_MAP ) ) {
+          for( const prop of props ) {
 
-          const values = graph.each( instanceNode, prop, undefined );
-          if( values.length > 0 ){
-            instance.label = values.map( (el) => {
-              switch( el.termType ) {
-                case 'Literal': return { type: 'literal', value: el.value };
-                default:        throw new Error( `Unsupported value ${el.termType} for key ${key}` );
-              }
-            });
-            break;
+            const values = graph.each( instanceNode, prop, undefined );
+            if( values.length > 0 ){
+              instance[ key ] = values.map( (el) => {
+                switch( el.termType ) {
+                  case 'Literal': return { type: 'literal', value: el.value };
+                  default:        throw new Error( `Unsupported value ${el.termType} for key ${key}` );
+                }
+              });
+              break;
+            }
           }
-
-        } // for prop
+        } // for literal props
 
         // backup for label: take the local part from the IRI
         if( !instance.label ) {

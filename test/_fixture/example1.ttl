@@ -7,11 +7,13 @@
 
 ex:TreeHeight a iop:Variable ;
               rdfs:label              "Height of a tree"@en ;
+              rdfs:comment            "trees generally grow upwards, so we measure there height from the ground up"@en ;
               iop:hasObjectOfInterest ex:Tree ;
               iop:hasProperty         om:Height .
 
 ex:Tree a iop:Entity ;
-        rdfs:label "a biological tree"@en .
+        rdfs:label    "a biological tree"@en ;
+        rdfs:comment  "in particular, this is not a tree in the data structure sense"@en .
 
 om:Height a iop:Property ;
           rdfs:label "Height"@en .
