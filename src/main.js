@@ -23,11 +23,16 @@ document.querySelector( '#visualize' )
       const layout = await createLayout( content[0] );
       // document.querySelector( '#dev' ).innerHTML = JSON.stringify( content, null, 2 );
 
+      // get SVG container
+      const svg = document.querySelector( '#svg' );
       // draw it
-      await draw( document.querySelector( '#svg' ), layout );
+      await draw( svg, layout );
 
       // enable export button
       document.querySelector( '#export' ).classList.remove( 'invisible' );
+
+      // scroll into view
+      svg.scrollIntoView( true );
 
 
     } catch( e ) {
