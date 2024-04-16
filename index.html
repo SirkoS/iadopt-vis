@@ -28,25 +28,39 @@
       <div class="tab-pane fade show active" id="rdf-tab-pane" role="tabpanel" aria-labelledby="rdf-tab" tabindex="0">
 
         <textarea id="input" class="font-monospace">
-@base           <http://example.org/> .
-@prefix ex:     <http://example.org/> .
+@prefix pato:   <http://purl.obolibrary.org/obo/> .
+@prefix p01:    <http://vocab.nerc.ac.uk/collection/P01/current/> .
+@prefix s06:    <http://vocab.nerc.ac.uk/collection/S06/current/> .
+@prefix s12:    <http://vocab.nerc.ac.uk/collection/S12/current/> .
+@prefix s27:    <http://vocab.nerc.ac.uk/collection/S27/current/> .
+@prefix worms:  <https://marinespecies.org/aphia.php?p=taxdetails&id=> .
 @prefix iop:    <https://w3id.org/iadopt/ont/> .
 @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix om:     <http://www.ontology-of-units-of-measure.org/resource/om-2/> .
 
-ex:TreeHeight a iop:Variable ;
-              rdfs:label              "Height of a tree"@en ;
-              rdfs:comment            "trees generally grow upwards, so we measure there height from the ground up"@en ;
-              iop:hasObjectOfInterest ex:Tree ;
-              iop:hasProperty         om:Height .
+p01:IC000344 a iop:Variable ;
+  rdfs:label              "concentration of endosulfane sulfate in wet flesh of ostrea edulis"@en ;
+  iop:hasProperty         s06:S0600045 ;
+  iop:hasObjectOfInterest s27:CS003625 ;
+  iop:hasMatrix           s12:S1214 ;
+  iop:hasContextObject    worms:140658 ;
+  iop:hasConstraint       [
+    a pato:PATO_0001823 ;
+    rdfs:label      "wet"@en ;
+    iop:constrains  s12:S1214
+  ] .
 
-ex:Tree a iop:Entity ;
-        rdfs:label    "a biological tree"@en ;
-        rdfs:comment  "in particular, this is not a tree in the data structure sense"@en .
+s06:S0600045 a iop:Property ;
+  rdfs:label "Concentration"@en .
 
-om:Height a iop:Property ;
-          rdfs:label "Height"@en .
+s27:CS003625 a iop:Entity ;
+  rdfs:label "endosulfan sulfate"@en .
+
+s12:S1214 a iop:Entity ;
+  rdfs:label "flesh"@en .
+
+worms:140658 a iop:Entity ;
+  rdfs:label "Ostrea edulis"@en .
+
           </textarea>
 
       </div>

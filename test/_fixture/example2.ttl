@@ -1,0 +1,32 @@
+@prefix pato:   <http://purl.obolibrary.org/obo/> .
+@prefix p01:    <http://vocab.nerc.ac.uk/collection/P01/current/> .
+@prefix s06:    <http://vocab.nerc.ac.uk/collection/S06/current/> .
+@prefix s12:    <http://vocab.nerc.ac.uk/collection/S12/current/> .
+@prefix s27:    <http://vocab.nerc.ac.uk/collection/S27/current/> .
+@prefix worms:  <https://marinespecies.org/aphia.php?p=taxdetails&id=> .
+@prefix iop:    <https://w3id.org/iadopt/ont/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+
+p01:IC000344 a iop:Variable ;
+  rdfs:label              "concentration of endosulfane sulfate in wet flesh of ostrea edulis"@en ;
+  iop:hasProperty         s06:S0600045 ;
+  iop:hasObjectOfInterest s27:CS003625 ;
+  iop:hasMatrix           s12:S1214 ;
+  iop:hasContextObject    worms:140658 ;
+  iop:hasConstraint       [
+    a pato:PATO_0001823 ;
+    rdfs:label      "wet"@en ;
+    iop:constrains  s12:S1214
+  ] .
+
+s06:S0600045 a iop:Property ;
+  rdfs:label "Concentration"@en .
+
+s27:CS003625 a iop:Entity ;
+  rdfs:label "endosulfan sulfate"@en .
+
+s12:S1214 a iop:Entity ;
+  rdfs:label "flesh"@en .
+
+worms:140658 a iop:Entity ;
+  rdfs:label "Ostrea edulis"@en .

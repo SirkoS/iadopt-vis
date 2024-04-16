@@ -11,8 +11,8 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "type":   { "enum": [ "literal" ],  "type": "string" },
-          "value":  {                         "type": "string" }
+          "value":  { "type": "string" },
+          "lang":   { "type": "string" }
         }
       }
     },
@@ -22,8 +22,20 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "type":     { "enum": [ "iri", "literal" ],              "type": "string" },
-          "value":    {                                            "type": "string"      },
+          "iri":      {                                            "type": "string"      },
+          "shortIri": { "description": "prefixed IRI if possible", "type": "string" },
+          "label":    {                                            "$ref": "#/definitions/label" },
+          "comment":  {                                            "$ref": "#/definitions/label" }
+        }
+      }
+    },
+    "constraint": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "iri":      {                                            "type": "string"      },
           "shortIri": { "description": "prefixed IRI if possible", "type": "string" },
           "label":    {                                            "$ref": "#/definitions/label" },
           "comment":  {                                            "$ref": "#/definitions/label" }
@@ -40,10 +52,10 @@
     "label":      { "description": "label of the Variable",       "$ref": "#/definitions/label" },
     "comment":    { "description": "description of the Variable", "$ref": "#/definitions/label" },
 
-    "constraint": { "description": "iop:Constraint",              "$ref": "#/definitions/entity" },
     "context":    { "description": "iop:ContextObject",           "$ref": "#/definitions/entity" },
     "matrix":     { "description": "iop:Matrix",                  "$ref": "#/definitions/entity" },
     "prop":       { "description": "iop:Property",                "$ref": "#/definitions/entity" },
-    "ooi":        { "description": "iop:ObjectOfInterest",        "$ref": "#/definitions/entity" }
+    "ooi":        { "description": "iop:ObjectOfInterest",        "$ref": "#/definitions/entity" },
+    "constraint": { "description": "iop:Constraint",              "$ref": "#/definitions/constraint" }
   }
 }

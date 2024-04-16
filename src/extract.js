@@ -1,24 +1,27 @@
-import * as Rdflib from 'rdflib';
+import N3 from 'n3';
+import { QueryEngine } from '@comunica/query-sparql-rdfjs';
 
-const NAMED_GRAPH = 'http://named.graph/';
 const NS = {
-  iop:  Rdflib.Namespace( 'https://w3id.org/iadopt/ont/' ),
-  rdf:  Rdflib.Namespace( 'http://www.w3.org/1999/02/22-rdf-syntax-ns#' ),
-  rdfs: Rdflib.Namespace( 'http://www.w3.org/2000/01/rdf-schema#' ),
+  iop:  'https://w3id.org/iadopt/ont/',
+  rdf:  'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+  rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
 };
 const PROP_MAP = {
-  label:      [ NS.rdfs( 'label' ) ],
-  comment:    [ NS.rdfs( 'comment' ), NS.rdf( 'description') ],
-  ooi:        [ NS.iop( 'hasObjectOfInterest' ) ],
-  prop:       [ NS.iop( 'hasProperty' ) ],
-  matrix:     [ NS.iop( 'hasMatrix' ) ],
-  context:    [ NS.iop( 'hasContextObject' ) ],
-  constraint: [ NS.iop( 'hasConstraint' ) ],
+  label:      [ NS.rdfs + 'label' ],
+  comment:    [ NS.rdfs + 'comment', NS.rdfs + 'description' ],
+  ooi:        [ NS.iop + 'hasObjectOfInterest' ],
+  prop:       [ NS.iop + 'hasProperty' ],
+  matrix:     [ NS.iop + 'hasMatrix' ],
+  context:    [ NS.iop + 'hasContextObject' ],
+  constraint: [ NS.iop + 'hasConstraint' ],
 };
-const LITERAL_PROP_MAP = {
-  label:    PROP_MAP.label,
-  comment:  PROP_MAP.comment,
-};
+const INV_PROP_MAP = Object.entries( PROP_MAP )
+  .reduce( (all, props) => {
+    for( const prop of props[1] ) {
+      all[ prop ] = props[0];
+    }
+    return all;
+  }, {} );
 
 /**
  * Parse a TTL representation of the Variable to the internal object format
@@ -27,104 +30,216 @@ const LITERAL_PROP_MAP = {
  */
 export default async function extract( content ) {
 
-  // parse input
-  const graph = Rdflib.graph();
-  Rdflib.parse( content, graph, NAMED_GRAPH );
+  // parse into graph
+  const {store: graph, prefixes } = await parseContent( content );
 
-  // get all variables
-  const variables = queryType( graph, NS.iop( 'Variable' ) );
+  // initialize engine
+  const engine = new QueryEngine();
 
-  // add entries for each variable
-  const result = [];
-  for( const variable of variables ){
+  // collect all Variables
+  // variables might have multiple response rows
+  const result = {};
+  const entities = {};
 
-    // entry base
-    const entry = {
-      iri: variable.value,
-      shortIri: getPrefixed( graph.namespaces, variable.value ),
-      ... Object.keys( PROP_MAP ).reduce( (all,el) => ({ [el]: [], ... all }), {} ),
-    };
-    result.push( entry );
+  // first query: unique properties
+  const variableStream = await engine.queryBindings(`
+    PREFIX iop: <${NS.iop}>
 
-    // grab all properties and collect their values in the entry
-    for( const [ key, props ] of Object.entries( PROP_MAP ) ) {
+    SELECT
+      ?variable ?ooi ?prop ?matrix
+      ?variableLabel ?variableComment
+      ?ooiLabel ?ooiComment
+      ?propLabel ?propComment
+      ?matrixLabel ?matrixComment
+    WHERE {
+      VALUES ?labelProp { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
+      VALUES ?commentProp { ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( ' ' )} }
 
-      for( const prop of props ) {
-        const values = graph.each( variable, prop, undefined );
-        if( values.length > 0 ){
-          entry[ key ] = values.map( (el) => {
-            switch( el.termType ) {
-              case 'NamedNode': return { type: 'iri',     value: el.value };
-              case 'Literal':   return { type: 'literal', value: el.value };
-              default: throw new Error( `Unsupported value ${el.termType} for key ${key}` );
-            }
+      ?variable a iop:Variable ;
+                iop:hasObjectOfInterest  ?ooi ;
+                iop:hasProperty          ?prop .
+      OPTIONAL { ?variable  ?labelProp    ?variableLabel . }
+      OPTIONAL { ?variable  ?commentProp  ?variableComment . }
+      OPTIONAL { ?ooi       ?labelProp    ?ooiLabel . }
+      OPTIONAL { ?ooi       ?commentProp  ?ooiComment . }
+      OPTIONAL { ?prop      ?labelProp    ?propLabel . }
+      OPTIONAL { ?prop      ?commentProp  ?propComment . }
+      OPTIONAL {
+        ?variable iop:hasMatrix ?matrix .
+        OPTIONAL { ?matrix ?labelProp    ?matrixLabel . }
+        OPTIONAL { ?matrix ?commentProp  ?matrixComment . }
+      }
+    }`, { sources: [graph] });
+  for await (const binding of variableStream) {
+
+    // get variable
+    const variable = binding.get('variable').value;
+    if( !(variable in result) ) {
+      result[ variable ] = {
+        iri:      variable,
+        shortIri: getPrefixed( prefixes, variable ),
+        label:      [],
+        comment:    [],
+        ooi:        new Set(),
+        prop:       new Set(),
+        matrix:     new Set(),
+        context:    new Set(),
+        constraint: new Set(),
+      };
+    }
+    const entry = result[ variable ];
+    entities[ variable ] = entry;
+
+    // add unique properties
+    for( const key of [ 'ooi', 'prop', 'matrix' ] ) {
+      const value = binding.get( key )?.value;
+      if( value ) {
+        if( !(value in entities) ) {
+          entities[ value ] ={
+            iri:      value,
+            shortIri: getPrefixed( prefixes, value ),
+            label:    [],
+            comment:  [],
+          };
+        }
+        entry[ key ].add( entities[ value ] );
+      }
+    }
+
+    // add labels & descriptions
+    for( const key of ['variable', 'ooi', 'prop', 'matrix' ]) {
+      const entity = binding.get( key )?.value;
+      if( entity ) {
+        let value = binding.get( key + 'Label' );
+        if( value ) {
+          entities[ entity ].label.push({
+            value:  value.value,
+            lang:   value.language
           });
-          break;
+        }
+        value = binding.get( key + 'Comment' )?.value;
+        if( value ) {
+          entities[ entity ].comment.push({
+            value:  value.value,
+            lang:   value.language
+          });
+        }
+      }
+
+    }
+
+    // get non-unique properties
+    const propStream = await engine.queryBindings(`
+      PREFIX iop: <${NS.iop}>
+
+      SELECT ?prop ?value ?labelProp ?label ?commentProp ?comment
+      WHERE {
+        VALUES ?prop { iop:hasContextObject iop:hasConstraint }
+        VALUES ?labelProp   { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
+        VALUES ?commentProp { ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( ' ' )} }
+
+        <${variable}> ?prop ?value .
+        OPTIONAL{ ?value ?labelProp   ?label . }
+        OPTIONAL{ ?value ?commentProp ?comment . }
+      }`, { sources: [graph] });
+
+    // add non-unique properties
+    for await ( const binding of propStream ) {
+      const key = INV_PROP_MAP[ binding.get('prop')?.value ];
+      if( key ) {
+
+        // entity
+        const entity = binding.get( 'value' ).value;
+        if( !(entity in entities) ) {
+          entities[ entity ] = {
+            iri:      entity,
+            shortIri: getPrefixed( prefixes, entity ),
+            label:    [],
+            comment:  [],
+          };
+        }
+        entry[ key ].add( entities[ entity ] );
+
+        // label
+        let value = binding.get( 'label' );
+        if( value ) {
+          entities[ entity ].label.push({
+            value:  value.value,
+            lang:   value.language
+          });
+        }
+        // description
+        value = binding.get( 'comment' )?.value;
+        if( value ) {
+          entities[ entity ].comment.push({
+            value:  value.value,
+            lang:   value.language
+          });
         }
       }
     }
 
-    // further get data (label) for some more properties
-    for( const key of [ 'ooi', 'prop', 'matrix', 'context' ] ) {
-
-      // for each individual of that type
-      for( const instance of entry[ key ] ) {
-
-        // add shortened IRI, if possible
-        instance.shortIri = getPrefixed( graph.namespaces, instance.value );
-
-        // for use within RDFlib this needs to be a named node
-        const instanceNode = Rdflib.sym( instance.value );
-
-        // try to get labels and comments
-        for( const [ key, props ] of Object.entries( LITERAL_PROP_MAP ) ) {
-          for( const prop of props ) {
-
-            const values = graph.each( instanceNode, prop, undefined );
-            if( values.length > 0 ){
-              instance[ key ] = values.map( (el) => {
-                switch( el.termType ) {
-                  case 'Literal': return { type: 'literal', value: el.value };
-                  default:        throw new Error( `Unsupported value ${el.termType} for key ${key}` );
-                }
-              });
-              break;
-            }
-          }
-        } // for literal props
-
-        // backup for label: take the local part from the IRI
-        if( !instance.label ) {
-
-          // cutoff for the local part; might be separated by # or /
-          const posHash = instance.value.lastIndexOf( '#' );
-          const splitPos = posHash > 0 ? posHash : instance.value.lastIndexOf( '/' );
-
-          // set the label
-          instance.label = [{
-            type:   'literal',
-            value:  instance.value.slice( splitPos + 1 ),
-          }];
-
-        }
-
-      } // for instance
-
-    } // for key
-
   }
 
-  return result;
+  // remove duplicates
+  for( const entity of Object.values( entities ) ) {
+    for( const key of [ 'label', 'comment' ] ) {
+      // https://stackoverflow.com/a/58429784/1169798
+      entity[ key ] = Array.from(
+        new Map(entity[ key ].map( (el) => [ `${el.lang}|${el.value}`, el])).values()
+      );
+    }
+  }
+
+  // replace Sets by Arrays
+  for( const entity of Object.values( entities ) ) {
+    for( const [ key, val ] of Object.entries( entity ) ) {
+      if( val instanceof Set ) {
+        entity[ key ] = Array.from( val );
+      }
+    }
+  }
+
+  // done
+  return Object.values( result );
 
 }
 
+/**
+ * @typedef  {Object} ParseResponse
+ * @property {N3.Store}                 store     store holding graph data
+ * @property {object.<string, string>}  prefixes  map of prefixes
+ */
 
-function queryType( graph, type ) {
-  return graph
-    .each( undefined, NS.rdf( 'type' ), type )
-    // .map( (el) => el.termType == 'NamedNode' ? el.value : null )
-    .filter( (el) => el );
+/**
+ * parse a given RDF-string into a graph store
+ * @param   {String}                  content   RDF-compliant data
+ * @returns {Promise.<ParseResponse>}           parsed data
+ */
+function parseContent( content ) {
+  return new Promise( (resolve, reject) => {
+    const parser = new N3.Parser();
+    const store = new N3.Store();
+    parser.parse( content,
+                  (error, quad, prefixes) => {
+
+                    // errors
+                    if( error ) {
+                      reject( error );
+                    }
+
+                    // content
+                    if (quad) {
+                      store.add( quad );
+                    } else {
+                      resolve( { store, prefixes } );
+                    }
+
+                  });
+  });
 }
+
+
 
 /**
  * shorten a given IRI by trying to apply prefixes
