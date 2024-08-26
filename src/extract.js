@@ -45,7 +45,7 @@ export default async function extract( content ) {
   const variableStream = await engine.queryBindings(`
     PREFIX iop: <${NS.iop}>
 
-    SELECT
+    SELECT DISTINCT
       ?variable ?ooi ?prop ?matrix
       ?variableLabel ?variableComment
       ?ooiLabel ?ooiComment
@@ -100,6 +100,8 @@ export default async function extract( content ) {
             shortIri: getPrefixed( prefixes, value ),
             label:    [],
             comment:  [],
+            isBlank:  binding.get( key ).termType == 'BlankNode',
+            constrained: [],
           };
         }
         entry[ key ].add( entities[ value ] );
@@ -132,7 +134,8 @@ export default async function extract( content ) {
     const propStream = await engine.queryBindings(`
       PREFIX iop: <${NS.iop}>
 
-      SELECT ?prop ?value ?labelProp ?label ?commentProp ?comment
+      SELECT DISTINCT
+        ?prop ?value ?label ?comment ?target
       WHERE {
         VALUES ?prop { iop:hasContextObject iop:hasConstraint }
         VALUES ?labelProp   { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
@@ -141,6 +144,7 @@ export default async function extract( content ) {
         <${variable}> ?prop ?value .
         OPTIONAL{ ?value ?labelProp   ?label . }
         OPTIONAL{ ?value ?commentProp ?comment . }
+        OPTIONAL{ ?value iop:constrains ?target . }
       }`, { sources: [graph] });
 
     // add non-unique properties
@@ -156,6 +160,8 @@ export default async function extract( content ) {
             shortIri: getPrefixed( prefixes, entity ),
             label:    [],
             comment:  [],
+            isBlank:  binding.get( 'value' ).termType == 'BlankNode',
+            constrained: [],
           };
         }
         entry[ key ].add( entities[ entity ] );
@@ -176,6 +182,22 @@ export default async function extract( content ) {
             lang:   value.language
           });
         }
+
+        // constrains
+        if( key == 'constraint' ) {
+
+          // prep output
+          entities[ entity ].constrains = [];
+
+          // get the target of the constraint
+          const target = binding.get( 'target' ).value;
+          if( target ) {
+            entities[ entity ].constrains.push( entities[ target ] );
+            entities[ target ].constrained.push( entities[ entity ] );
+          }
+
+        }
+
       }
     }
 

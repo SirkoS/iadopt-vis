@@ -24,7 +24,7 @@ export default function calcBoxWidth( boxes ) {
   // assign to all boxes
   for( const [ index, box ] of Object.entries( boxes ) ) {
     box.width = width;
-    box.x = Cfg.layout.margin                                     // outer margin
+    box.x = Cfg.layout.margin                                    // outer margin
             + index * ( width + Cfg.layout.entity.horMargin );   // previous boxes in that row
   }
 

@@ -22,10 +22,12 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "iri":      {                                            "type": "string"      },
-          "shortIri": { "description": "prefixed IRI if possible", "type": "string" },
-          "label":    {                                            "$ref": "#/definitions/label" },
-          "comment":  {                                            "$ref": "#/definitions/label" }
+          "iri":        {                                            "type": "string"      },
+          "shortIri":   { "description": "prefixed IRI if possible", "type": "string" },
+          "label":      {                                            "$ref": "#/definitions/label" },
+          "comment":    {                                            "$ref": "#/definitions/label" },
+          "isBlank":    {                                            "type": "boolean" },
+          "constrained": {                                           "$ref": "#/definitions/constraint" }
         }
       }
     },
@@ -35,10 +37,13 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "iri":      {                                            "type": "string"      },
-          "shortIri": { "description": "prefixed IRI if possible", "type": "string" },
-          "label":    {                                            "$ref": "#/definitions/label" },
-          "comment":  {                                            "$ref": "#/definitions/label" }
+          "iri":        {                                            "type": "string"      },
+          "shortIri":   { "description": "prefixed IRI if possible", "type": "string" },
+          "label":      {                                            "$ref": "#/definitions/label" },
+          "comment":    {                                            "$ref": "#/definitions/label" },
+          "isBlank":    {                                            "type": "boolean" },
+          "constrained": {                                           "$ref": "#/definitions/constraint" },
+          "constrains": {                                            "$ref": "#/definitions/entity" }
         }
       }
     }

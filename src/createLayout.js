@@ -1,14 +1,16 @@
 import Cfg from './config.js';
-import calcBoxWidth from './createLayout/proportionalWidth.js';
+import calcBoxWidth from './createLayout/equalWidth.js';
 import getTextDims from './createLayout/getTextDims.js';
 import splitText from './createLayout/splitText.js';
 
 // labels for arrows connecting Variable and the direct properties
 const ARROW_LABELS = {
-  prop:     'hasProperty',
-  matrix:   'hasMatrix',
-  context:  'hasContextObject',
-  ooi:      'hasObjectOfInterest',
+  prop:           'hasProperty',
+  matrix:         'hasMatrix',
+  context:        'hasContextObject',
+  ooi:            'hasObjectOfInterest',
+  constrains:     'constrains',
+  hasconstraint:  'hasConstraint',
 };
 
 /**
@@ -41,7 +43,7 @@ export default function createLayout( data ) {
   calcBoxWidth([ ... data.matrix, ... data.ooi, ... data.context, ... data.prop ]);
 
   // entries for all single valued components
-  for( const key of [ 'prop', 'matrix', 'ooi' ] ) {
+  for( const key of [ 'prop', 'matrix', 'ooi', 'context' ] ) {
     if( (key in data) && (data[key].length > 0) ) {
 
       // add the box
@@ -62,6 +64,117 @@ export default function createLayout( data ) {
       };
       result.arrows.push( arrow );
 
+    }
+  }
+
+  // add constraints
+  for( const constraint of data.constraint ) {
+
+    // copy part of the dimensions from parent box (aka the entity being constrained)
+    const parent = constraint.constrains[0];
+    constraint.x = parent.box.x;
+    constraint.width = parent.box.width;
+
+    // determine where to start vertically
+    const startY = parent.startY
+                    ?? parent.box.y + parent.box.height
+                       + Cfg.layout.entity.vertMarginSmall;
+
+    // add the box
+    box = getBox( 'Constraint', constraint, startY );
+    result.boxes.push( box );
+
+    // add the corresponding arrow
+    if( !parent.startY ) {
+      // full arrow only for the first constraint
+      arrow = {
+        text: ARROW_LABELS.constrains,
+        path: [
+          { x: box.x + 0.5 * box.width, y: box.y },
+          {
+            x: parent.box.x + 0.5 * parent.box.width,
+            y: parent.box.y + parent.box.height + 6
+          },
+        ],
+        x:    box.x + 0.5 * box.width,
+        y:    parent.box.y + parent.box.height + 0.5 * (box.y - parent.box.y - parent.box.height) + 5,
+        dim:  getTextDims( ARROW_LABELS.constrains ),
+        type: 'constrains',
+      };
+    } else {
+      // later ones get only a path fragment
+      arrow = {
+        path: [
+          { x: box.x + 0.5 * box.width, y: box.y },
+          {
+            x: parent.box.x + 0.5 * parent.box.width,
+            y: parent.startY - Cfg.layout.entity.vertMarginTiny, // account for the distance to next-higher box
+          },
+        ],
+        x:    box.x + 0.5 * box.width,
+        y:    parent.box.y + parent.box.height + 0.5 * (box.y - parent.box.y - parent.box.height) + 5,
+        type: 'constrains',
+        hideHead: true,
+      };
+
+    }
+    result.arrows.push( arrow );
+
+    // adjust parent start, if more constraints are coming
+    parent.startY = box.y + box.height + Cfg.layout.entity.vertMarginTiny;
+
+  }
+
+  // add hasConstraint arrows, if needed
+  for( const key of [ 'matrix', 'ooi', 'context' ] ) {
+    if( (key in data) && (data[key].length > 0) ) {
+
+      // shortcut
+      const parent = data[key][0];
+
+      // skip for entities without properties
+      if( !parent.constrained.length ) {
+        continue;
+      }
+
+      // add arrow to first constraint (includes label)
+      const x = parent.box.x + parent.box.width + 0.5 * Cfg.layout.entity.horMargin;
+      let constraint = parent.constrained[0];
+      arrow = {
+        text: ARROW_LABELS.hasconstraint,
+        path: [
+          { x: x, y: variableBox.y + variableBox.height },
+          { x: x, y: constraint.box.y + 0.5 * constraint.box.height },
+          { x: x - 0.5 * Cfg.layout.entity.horMargin + 6, y: constraint.box.y + 0.5 * constraint.box.height },
+        ],
+        x:    x,
+        y:    variableBox.y + variableBox.height + 0.5 * (parent.box.y - variableBox.y - variableBox.height) + 20,
+        dim:  getTextDims( ARROW_LABELS.hasconstraint ),
+        type: 'hasConstraint',
+        rotate: true,
+      };
+      result.arrows.push( arrow );
+
+      // arrows for all other constraints
+      for( let i=1; i<parent.constrained.length; i++ ) {
+
+        // shortcuts
+        const cur  = parent.constrained[ i ],
+              prev = parent.constrained[ i - 1 ];
+
+        // add arrow
+        arrow = {
+          path: [
+            { x: x, y: prev.box.y + 0.5 * prev.box.height },
+            { x: x, y: cur.box.y  + 0.5 * cur.box.height },
+            { x: x - 0.5 * Cfg.layout.entity.horMargin + 6, y: cur.box.y + 0.5 * cur.box.height },
+          ],
+          x:    x,
+          y:    variableBox.y + variableBox.height + 0.5 * (parent.box.y - variableBox.y - variableBox.height) + 20,
+          type: 'hasConstraint',
+        };
+        result.arrows.push( arrow );
+      }
     }
   }
 
@@ -108,7 +221,7 @@ function getBox( type, data, initialY ) {
   if( data.comment && (data.comment.length > 0) ) {
 
     // set apart from the above text
-    startY +=  + Cfg.layout.entity.textMargin;
+    startY += Cfg.layout.entity.textMargin;
 
     // split description until it fits the box width
     let commentWidth = getTextDims( data.comment[0].value );
@@ -145,6 +258,11 @@ function getBox( type, data, initialY ) {
     ? descSeparator
     : null;
 
+  // if there's no description, remove the space again
+  if( lines.length < 1 ) {
+    startY -= 0.5 * Cfg.layout.entity.header.height;
+  }
+
   // base entry for the box
   const box = {
     x:              data.x ?? Cfg.layout.margin,
@@ -172,6 +290,9 @@ function getBox( type, data, initialY ) {
       ... lines
     ],
   };
+
+  // attach box to the actual entry
+  data.box = box;
 
   return box;
 

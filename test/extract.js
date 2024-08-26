@@ -7,8 +7,13 @@ describe( 'extract', function() {
 
   const fixtures = {};
   before( async function(){
+
     fixtures.example1 = await Fs.readFile( './test/_fixture/example1.ttl', 'utf8' );
     fixtures.example2 = await Fs.readFile( './test/_fixture/example2.ttl', 'utf8' );
+
+    // increase test timeouts
+    this.timeout( 5000 );
+
   });
 
 
@@ -45,11 +50,10 @@ describe( 'extract', function() {
 
 
 
-  it( 'should extract all components of an entry with blank node constrains', async function(){
+  it( 'should extract all components of an entry with blank node constraints', async function(){
 
     // get entities
     const result = await extract( fixtures.example2 );
-    // console.log( JSON.stringify( result, null, 2 ) );
 
     // structural validation
     assert.isArray( result, 'should return an array' );

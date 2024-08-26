@@ -61,23 +61,29 @@ export default function draw( div, layout ) {
     const path = arr.path.map( (el) => `${el.x},${el.y}` );
     container.appendChild( createElement( 'path', {
       d:      `M ${path.join(' ')}`,
-      style:  'marker-end: url(#arrowHeadEnd);',
+      style:  arr.hideHead ? '' : 'marker-end: url(#arrowHeadEnd);',
     }) );
 
     // arrow label
-    const textEl = createElement( 'text', {
-      x: arr.x,
-      y: arr.y,
-    });
-    textEl.innerHTML = arr.text;
-    container.appendChild( textEl );
+    if( arr.text ) {
 
-    // arrow cutout
-    // (so text does not overlap with arrow stroke)
-    arrowMask.appendChild( createElement( 'path', {
-      d: `M ${arr.x - 0.5*arr.dim.width},${arr.y - 0.5*arr.dim.height}
+      const textEl = createElement( 'text', {
+        x: arr.x,
+        y: arr.y,
+        transform: arr.rotate ? `rotate( -90 ${arr.x} ${arr.y} )` : '',
+      });
+      textEl.innerHTML = arr.text;
+      container.appendChild( textEl );
+
+      // arrow cutout
+      // (so text does not overlap with arrow stroke)
+      arrowMask.appendChild( createElement( 'path', {
+        d: `M ${arr.x - 0.5*arr.dim.width},${arr.y - 0.5*arr.dim.height}
           l 0,${arr.dim.height} ${arr.dim.width},0 0,-${arr.dim.height} Z`,
-    }));
+        transform: arr.rotate ? `rotate( -90 ${arr.x} ${arr.y} )` : '',
+      }));
+
+    }
 
     // add to DOM
     svg.appendChild( container );

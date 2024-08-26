@@ -62,6 +62,7 @@ rect.title {
 .arrow path {
   stroke: black;
   mask:   url(#arrowMask);
+  fill:   none;
 }
 .arrow text {
   font-size: 10pt;

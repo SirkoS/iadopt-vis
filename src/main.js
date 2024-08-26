@@ -40,3 +40,5 @@ document.querySelector( '#visualize' )
     }
 
   });
+
+document.querySelector( '#visualize' ).click();

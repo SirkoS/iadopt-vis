@@ -23,8 +23,14 @@ export default {
       // vertical distance between two boxes
       vertMargin: 80,
 
+      // vertical distance between entity and its constraints
+      vertMarginSmall: 40,
+
+      // vertical distance between multiple constraints
+      vertMarginTiny: 20,
+
       // horizontal distance between two boxes
-      horMargin: 20,
+      horMargin: 30,
 
       // minimal distance between text and the borders of the corresponding box
       minPadding: 20,

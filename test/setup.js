@@ -1,4 +1,4 @@
-import Chai           from 'chai';
+import * as Chai      from 'chai';
 import ChaiJsonSchema from 'chai-json-schema-ajv';
 
 // chai plugins
