@@ -18,15 +18,20 @@ switch( true ) {
 
 if( data ) {
 
-  // create the layout
-  const layout = await createLayout( data );
+  (async function(){
 
-  // get SVG container
-  const svg = document.querySelector( '#svg' );
-  // svg.innerHTML = '';
+    // create the layout
+    const layout = await createLayout( data );
 
-  // draw it
-  draw( svg, layout );
-  svg.querySelector( 'svg' ).setAttribute( 'preserveAspectRatio', 'xMidYMin' );
+    // get SVG container
+    const svg = document.querySelector( '#svg' );
+    // svg.innerHTML = '';
+
+    // draw it
+    draw( svg, layout );
+    svg.querySelector( 'svg' ).setAttribute( 'preserveAspectRatio', 'xMidYMin' );
+
+  })()
+    .catch( (e) => console.error(e) );
 
 }
