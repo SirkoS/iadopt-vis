@@ -25,6 +25,7 @@ document.querySelector( '#visualize' )
 
       // get SVG container
       const svg = document.querySelector( '#svg' );
+
       // draw it
       await draw( svg, layout );
 

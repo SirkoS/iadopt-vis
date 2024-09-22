@@ -1,5 +1,6 @@
 import N3 from 'n3';
 import { QueryEngine } from '@comunica/query-sparql-rdfjs';
+import { Constraint, Entity, Property, Variable } from './model/models.js';
 
 const NS = {
   iop:  'https://w3id.org/iadopt/ont/',
@@ -15,13 +16,6 @@ const PROP_MAP = {
   context:    [ NS.iop + 'hasContextObject' ],
   constraint: [ NS.iop + 'hasConstraint' ],
 };
-const INV_PROP_MAP = Object.entries( PROP_MAP )
-  .reduce( (all, props) => {
-    for( const prop of props[1] ) {
-      all[ prop ] = props[0];
-    }
-    return all;
-  }, {} );
 
 /**
  * Parse a TTL representation of the Variable to the internal object format
@@ -75,18 +69,12 @@ export default async function extract( content ) {
     // get variable
     const variable = binding.get('variable').value;
     if( !(variable in result) ) {
-      result[ variable ] = {
+      result[ variable ] = new Variable({
         iri:      variable,
         shortIri: getPrefixed( prefixes, variable ),
-        label:      [],
-        comment:    [],
-        ooi:        new Set(),
-        prop:       new Set(),
-        matrix:     new Set(),
-        context:    new Set(),
-        constraint: new Set(),
-      };
+      });
     }
+    /** @type {Variable} */
     const entry = result[ variable ];
     entities[ variable ] = entry;
 
@@ -95,16 +83,23 @@ export default async function extract( content ) {
       const value = binding.get( key )?.value;
       if( value ) {
         if( !(value in entities) ) {
-          entities[ value ] ={
+          entities[ value ] = new (key == 'prop' ? Property : Entity)({
             iri:      value,
             shortIri: getPrefixed( prefixes, value ),
-            label:    [],
-            comment:  [],
             isBlank:  binding.get( key ).termType == 'BlankNode',
-            constrained: [],
-          };
+          });
         }
-        entry[ key ].add( entities[ value ] );
+        switch( key ) {
+          case 'ooi':
+            entry.setObjectOfInterest( entities[ value ] );
+            break;
+          case 'prop':
+            entry.setProperty( entities[ value ] );
+            break;
+          case 'matrix':
+            entry.setMatrix( entities[ value ] );
+            break;
+        }
       }
     }
 
@@ -114,17 +109,11 @@ export default async function extract( content ) {
       if( entity ) {
         let value = binding.get( key + 'Label' );
         if( value ) {
-          entities[ entity ].label.push({
-            value:  value.value,
-            lang:   value.language
-          });
+          entities[ entity ].setLabel( value.language, value.value );
         }
         value = binding.get( key + 'Comment' )?.value;
         if( value ) {
-          entities[ entity ].comment.push({
-            value:  value.value,
-            lang:   value.language
-          });
+          entities[ entity ].setComment( value.language, value.value );
         }
       }
 
@@ -149,51 +138,53 @@ export default async function extract( content ) {
 
     // add non-unique properties
     for await ( const binding of propStream ) {
-      const key = INV_PROP_MAP[ binding.get('prop')?.value ];
+      const key = binding.get('prop')?.value;
       if( key ) {
 
         // entity
         const entity = binding.get( 'value' ).value;
         if( !(entity in entities) ) {
-          entities[ entity ] = {
-            iri:      entity,
-            shortIri: getPrefixed( prefixes, entity ),
-            label:    [],
-            comment:  [],
-            isBlank:  binding.get( 'value' ).termType == 'BlankNode',
-            constrained: [],
-          };
+          if( key.includes( 'hasConstraint') ) {
+
+            // Constraint
+            entities[ entity ] = new Constraint({
+              iri:      entity,
+              shortIri: getPrefixed( prefixes, entity ),
+              isBlank:  binding.get( 'value' ).termType == 'BlankNode'
+            });
+            entry.addConstraint( entities[ entity ] );
+
+          } else {
+
+            // ContextObject
+            entities[ entity ] = new Entity({
+              iri:      entity,
+              shortIri: getPrefixed( prefixes, entity ),
+              isBlank:  binding.get( 'value' ).termType == 'BlankNode'
+            });
+            entry.addContextObject( entities[ entity ] );
+
+          }
         }
-        entry[ key ].add( entities[ entity ] );
 
         // label
         let value = binding.get( 'label' );
         if( value ) {
-          entities[ entity ].label.push({
-            value:  value.value,
-            lang:   value.language
-          });
+          entities[ entity ].setLabel( value.language, value.value );
         }
         // description
         value = binding.get( 'comment' )?.value;
         if( value ) {
-          entities[ entity ].comment.push({
-            value:  value.value,
-            lang:   value.language
-          });
+          entities[ entity ].setComment( value.language, value.value );
         }
 
         // constrains
-        if( key == 'constraint' ) {
-
-          // prep output
-          entities[ entity ].constrains = [];
+        if( key.includes( 'hasConstraint' ) ) {
 
           // get the target of the constraint
           const target = binding.get( 'target' ).value;
           if( target ) {
-            entities[ entity ].constrains.push( entities[ target ] );
-            entities[ target ].constrained.push( entities[ entity ] );
+            entry.addConstraint( entities[ entity ],entities[ target ] );
           }
 
         }
@@ -201,25 +192,6 @@ export default async function extract( content ) {
       }
     }
 
-  }
-
-  // remove duplicates
-  for( const entity of Object.values( entities ) ) {
-    for( const key of [ 'label', 'comment' ] ) {
-      // https://stackoverflow.com/a/58429784/1169798
-      entity[ key ] = Array.from(
-        new Map(entity[ key ].map( (el) => [ `${el.lang}|${el.value}`, el])).values()
-      );
-    }
-  }
-
-  // replace Sets by Arrays
-  for( const entity of Object.values( entities ) ) {
-    for( const [ key, val ] of Object.entries( entity ) ) {
-      if( val instanceof Set ) {
-        entity[ key ] = Array.from( val );
-      }
-    }
   }
 
   // done

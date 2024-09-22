@@ -23,6 +23,8 @@ export class Concept {
   _isBlank;
   /** @type {Array.<Constraint>} */
   _constrained = [];
+  /** @type {string} */
+  #role = '';
 
 
   /**
@@ -40,8 +42,8 @@ export class Concept {
     this._isBlank  = !iri;
 
     // prune empty labels/comments before adding
-    this._label    = Object.fromEntries( Object.entries( label ).filter( ([_, val]) => val ) );
-    this._comment  = Object.fromEntries( Object.entries( comment ).filter( ([_, val]) => val ) );
+    this._label    = Object.fromEntries( Object.entries( label ?? {} ).filter( ([_, val]) => val ) );
+    this._comment  = Object.fromEntries( Object.entries( comment ?? {} ).filter( ([_, val]) => val ) );
 
   }
 
@@ -109,6 +111,16 @@ export class Concept {
 
   /**
    *
+   * @params {string} lang
+   * @params {string} label
+   */
+  setLabel( lang, label ){
+    this._label[ lang ] = label;
+  }
+
+
+  /**
+   *
    * @returns {string}
    */
   getLabel(){
@@ -123,6 +135,16 @@ export class Concept {
 
   /**
    *
+   * @params {string} lang
+   * @params {string} comment
+   */
+  setComment( lang, comment ){
+    this._comment[ lang ] = comment;
+  }
+
+
+  /**
+   *
    * @returns {string}
    */
   getComment(){
@@ -132,6 +154,24 @@ export class Concept {
       }
     }
     return Object.values( this._comment )[ 0 ];
+  }
+
+
+  /**
+   *
+   * @param {string} role
+   */
+  setRole( role ) {
+    this.#role = role;
+  }
+
+
+  /**
+   *
+   * @returns {string}
+   */
+  getRole() {
+    return this.#role;
   }
 
 }
@@ -156,58 +196,94 @@ export class Variable extends Concept {
 
 
   /**
-   * @param {Concept} prop
+   * @param {Property} prop
    */
   setProperty( prop ) {
+    if( !(prop instanceof Property) ) {
+      throw new Error( 'Can only assign instances of Property!' );
+    }
     prop.setVariable( this );
+    prop.setRole( 'Property' );
     this.#property = prop;
   }
 
 
   /**
-   * @param {Concept} ooi
+   * @param {Entity} ooi
    */
   setObjectOfInterest( ooi ) {
+    if( !(ooi instanceof Entity) ) {
+      throw new Error( 'Can only assign instances of Entity!' );
+    }
     ooi.setVariable( this );
+    ooi.setRole( 'OoI' );
     this.#ooi = ooi;
   }
 
 
   /**
-   * @param {Concept} matrix
+   * @param {Entity} matrix
    */
   setMatrix( matrix ) {
+    if( !(matrix instanceof Entity) ) {
+      throw new Error( 'Can only assign instances of Entity!' );
+    }
     matrix.setVariable( this );
+    matrix.setRole( 'Matrix' );
     this.#matrix = matrix;
   }
 
 
   /**
-   * @param {Concept} ctx
+   * @param {Entity} ctx
    */
   addContextObject( ctx ) {
+    if( !(ctx instanceof Entity) ) {
+      throw new Error( 'Can only assign instances of Entity!' );
+    }
     ctx.setVariable( this );
+    ctx.setRole( 'ContextObject' );
     this.#context.push( ctx );
   }
 
 
   /**
    * @param {Constraint}  constraint
-   * @param {...Concept}  entities
+   * @param {...Entity}  entities
    */
   addConstraint( constraint, ...entities ) {
+    if( !(constraint instanceof Constraint) ) {
+      throw new Error( 'Can only assign instances of Constraint!' );
+    }
 
     // check that entity is assigned to this variable
     if( entities.some( (e) => e.getVariable() != this ) ) {
       throw Error('Can only constrain entities of the same variable!');
     }
 
-    // add reverse links
-    for ( const entity of entities ) {
-      entity.addConstraint( constraint );
-      constraint.addEntity( entity );
+    // check that this constraint is not already added
+    if( this.#constraints.includes( constraint ) ) {
+
+      // in this case, only make sure all entities are assigned
+      const assignedEntities = constraint.getEntities();
+      for( const entity of entities ) {
+        if( !assignedEntities.includes( entity ) ) {
+          constraint.addEntity( entity );
+          entity.addConstraint( constraint );
+        }
+      }
+
+      // skip remainder
+      return;
     }
 
+    // add reverse links
+    for ( const entity of entities ) {
+      constraint.addEntity( entity );
+      entity.addConstraint( constraint );
+    }
+
+    constraint.setRole( 'Constraint' );
     this.#constraints.push( constraint );
 
   }
@@ -215,7 +291,7 @@ export class Variable extends Concept {
 
   /**
    *
-   * @returns {Entity}
+   * @returns {Property}
    */
   getProperty() {
     return this.#property;
@@ -258,7 +334,6 @@ export class Variable extends Concept {
   }
 
 
-
   toString() {
     return `[Variable ${ this._iri ? `(${this._iri})` : '(_blank)' }`
   + (
@@ -282,7 +357,6 @@ ${this.#context.length ? this.#context.map( (c) => c.toString().split('\n').map(
 ]`;
   }
 
-
 }
 
 
@@ -299,6 +373,15 @@ export class Constraint extends Concept {
    */
   addEntity( ent ) {
     this.#constrains.push( ent );
+  }
+
+
+  /**
+   *
+   * @returns {Array.<Entity>}
+   */
+  getEntities() {
+    return this.#constrains.slice( 0 );
   }
 
 
@@ -330,6 +413,7 @@ export class Entity extends Concept {
   /** @typedef {Array.<Constraint>} */
   #constrained = [];
 
+
   /**
    *
    * @param {Constraint} constraint
@@ -346,6 +430,7 @@ export class Entity extends Concept {
   getConstraints() {
     return Array.from( this.#constrained );
   }
+
 
   toString() {
     return `[Entity ${ this._iri ? `(${this._iri})` : '(_blank)' }`
@@ -374,4 +459,27 @@ export class Entity extends Concept {
   ) + `
 ]`;
   }
+
+}
+
+
+/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+
+export class Property extends Concept {
+
+  toString() {
+    return `[Entity ${ this._iri ? `(${this._iri})` : '(_blank)' }`
+  + (
+    Object.values( this._label ).length
+     ? '\n  label:\n' + Object.entries(this._label).map( ([ key, value] ) => `    ${key}: ${value}` ).join('\n')
+     : ''
+  )
+  + (
+    Object.values( this._comment ).length
+     ? '\n  comment:\n' + Object.entries(this._comment).map( ([ key, value] ) => `    ${key}: ${value}` ).join('\n')
+     : ''
+  ) + `
+]`;
+  }
+
 }

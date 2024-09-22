@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>I-Adopt Remote Visualization</title>
+    <style>
+      html, body, svg, #svg {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+      }
+      .init text {
+        text-anchor: middle;
+        font-style: italic;
+        font-size: 10rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="svg">
+      <svg version="1.1"
+          xmlns="http://www.w3.org/2000/svg">
+        <g class="init">
+          <text x="50%" y="50%">Rendering</text>
+        </g>
+      </svg>
+      <div id="helper">
+        <svg><text></text></svg>
+      </div>
+    </div>
+    <script type="module" src="./src/remote.js"></script>
+  </body>
+</html>

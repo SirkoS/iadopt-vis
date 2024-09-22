@@ -1,9 +1,9 @@
-import { Concept, Constraint, Entity, Variable } from './models.js';
+import { Concept, Constraint, Entity, Property, Variable } from './models.js';
 
 /**
  * @returns {Variable}
  */
-export default function parse ( data ) {
+export default function parseJSONLD( data ) {
 
   // parse main variable content
   const variable = new Variable({
@@ -17,24 +17,24 @@ export default function parse ( data ) {
   });
 
   // parse components
-  let ent = parseEntity( data['property'] );
+  let ent = parseConcept( data['property'], Property );
   const lookup = {};
   if (ent) {
     variable.setProperty( ent );
   }
-  ent = parseEntity( data['ooi'] );
+  ent = parseConcept( data['ooi'], Entity );
   if (ent) {
     variable.setObjectOfInterest( ent );
     lookup[ ent.getIri() ] = ent;
   }
-  ent = parseEntity( data['matrix'] );
+  ent = parseConcept( data['matrix'], Entity );
   if (ent) {
     variable.setMatrix( ent );
     lookup[ ent.getIri() ] = ent;
   }
   if( data['context'] ) {
     for( const d of data['context'] ) {
-      ent = parseEntity(d);
+      ent = parseConcept( d, Entity );
       variable.addContextObject( ent );
       lookup[ ent.getIri() ] = ent;
     }
@@ -54,14 +54,14 @@ export default function parse ( data ) {
 
 
 
-function parseEntity( data ) {
+function parseConcept( data, Type ) {
 
   // no data given
   if (!data) {
     return;
   }
 
-  return new Entity({
+  return new Type({
     iri: data['@id'],
     label: {
       '': data['label']

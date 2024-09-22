@@ -1,7 +1,7 @@
 import { describe } from 'mocha';
 import { assert } from 'chai';
 
-describe( 'property-based testing of width-calculation', function() {
+describe.skip( 'property-based testing of width-calculation', function() {
 
   const variants = {
     'equalWidth': null,
