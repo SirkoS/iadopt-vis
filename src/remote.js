@@ -23,7 +23,7 @@ if( data ) {
 
   // get SVG container
   const svg = document.querySelector( '#svg' );
-  svg.innerHTML = '';
+  // svg.innerHTML = '';
 
   // draw it
   draw( svg, layout );

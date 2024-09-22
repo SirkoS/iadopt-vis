@@ -1,0 +1,35 @@
+name: Bug Report for Remote Visualization
+description: File a bug report for the remote visualization.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What went wrong?
+      description: Please describe what you saw and what went wrong or what you expected to see.
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browsers are you seeing the problem on?
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
+        - Mobile
+        - other
+  - type: textarea
+    id: src
+    attributes:
+      label: URL to the visualization
+      description: This field should be pre-populated with the URL of the remote visualization. If not, please copy&paste the full URL here.

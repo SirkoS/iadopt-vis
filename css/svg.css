@@ -76,3 +76,14 @@ mask path {
 mask rect {
   fill: #fff;
 }
+
+/* ------------------ Footer ----------------- */
+#footer text {
+  text-anchor:  end;
+  font-size:    6pt;
+  font-style:   italic;
+}
+
+#footer a {
+  text-decoration: none;
+}

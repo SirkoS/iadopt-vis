@@ -2,15 +2,6 @@ import Cfg from './config';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-// hard-wired dimensions of arrow labels, so we can mask a part of the corresponding arrows
-// can not easily determine the dimensions of the labels dynamically, so we use hard coded values here
-// need to be updated in case labels' font-size is changed
-const LABEL_DIM = {
-  prop:     { width:  75, height: 14, },
-  matrix:   { width:  65, height: 14, },
-  context:  { width: 105, height: 14, },
-  ooi:      { width: 120, height: 14, },
-};
 
 /**
  * render a given layout into a div
@@ -19,13 +10,16 @@ const LABEL_DIM = {
  */
 export default function draw( div, layout ) {
 
+  // grab copyright footer
+  const footer = div.querySelector( '#footer' );
+
   // get overall SVG height
   const height = Cfg.layout.margin // margin on bottom; top-margin is included in the box layouts
     + Math.max( ... layout.boxes.map( (el) => el.y + el.height ) ); // last y-coordinate of a box
 
   // main SVG container
   const svg = createElement( 'svg', {
-    'viewBox': `0 0 ${Cfg.layout.width} ${height}`
+    'viewBox': `0 0 ${Cfg.layout.width} ${height + (footer ? 20 : 0)}`
   });
 
   // some fixed components
@@ -159,6 +153,16 @@ export default function draw( div, layout ) {
     // add to DOM
     svg.appendChild( container );
 
+  }
+
+  // append footer
+  if( footer ) {
+    const issueLink = footer.querySelector( '.issue' );
+    if( issueLink ) {
+      issueLink.setAttribute( 'href', issueLink.getAttribute( 'href' ) + encodeURIComponent( document.location.toString() ) );
+    }
+    footer.setAttribute( 'transform', `translate( ${Cfg.layout.width - Cfg.layout.margin} ${height + Cfg.layout.margin*2} )` );
+    svg.appendChild( footer );
   }
 
   // add everything to the DOM
