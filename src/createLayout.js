@@ -229,9 +229,6 @@ function getBox( type, data, initialY ) {
   // append description, if available
   if( data.getComment() ) {
 
-    // set apart from the above text
-    startY += Cfg.layout.entity.textMargin;
-
     // split description until it fits the box width
     let commentWidth = getTextDims( data.getComment() );
     let comment = [ data.getComment() ];
@@ -294,6 +291,7 @@ function getBox( type, data, initialY ) {
         y: initialY + Cfg.layout.entity.header.height * 1.5,
         text: data.getLabel(),
         className: 'title',
+        link: data.getShortIri() ? undefined : data.getIri(),
       },
       // description
       ... lines
