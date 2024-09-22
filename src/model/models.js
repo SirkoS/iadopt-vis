@@ -124,12 +124,24 @@ export class Concept {
    * @returns {string}
    */
   getLabel(){
+
+    // preferred language
     for( const lang of Concept.#langPref ) {
       if ( lang in this._label ) {
         return this._label[ lang ];
       }
     }
-    return Object.values( this._label )[ 0 ];
+
+    // any language
+    let label = Object.values( this._label )[ 0 ];
+    if( label ) {
+      return label;
+    }
+
+    // extract from URL
+    const fragments = this._iri.split( '/' );
+    return fragments.pop() || fragments.pop() || '[missing label]';
+
   }
 
 
