@@ -12,14 +12,21 @@ switch( true ) {
     const raw = JSON.parse( decodeURI( currentLocation.searchParams.get( 'jsonld' ) ) );
     data = parseJSONLD( raw );
     break;
+  default:
+    document.querySelector( 'text' ).innerHTML = 'Missing data!';
 }
 
-// create the layout
-const layout = await createLayout( data );
+if( data ) {
 
-// get SVG container
-const svg = document.querySelector( '#svg' );
-svg.innerHTML = '';
+  // create the layout
+  const layout = await createLayout( data );
 
-// draw it
-draw( svg, layout );
+  // get SVG container
+  const svg = document.querySelector( '#svg' );
+  svg.innerHTML = '';
+
+  // draw it
+  draw( svg, layout );
+  svg.querySelector( 'svg' ).setAttribute( 'preserveAspectRatio', 'xMidYMin' );
+
+}
