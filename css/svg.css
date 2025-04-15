@@ -51,6 +51,12 @@ rect.title {
 .entity rect.title  { fill:   #6C8EBF; }
 .entity .frame      { stroke: #6C8EBF; }
 
+/* ---------- Statistical Modifier ----------- */
+
+.statmod rect        { fill:   #DDDDDD; }
+.statmod rect.title  { fill:   #666666; }
+.statmod .frame      { stroke: #666666; }
+
 /* ---------------- Constraint --------------- */
 
 .constraint rect        { fill:   #F8CECC; }

@@ -1,6 +1,6 @@
 import N3 from 'n3';
 import { QueryEngine } from '@comunica/query-sparql-rdfjs';
-import { Constraint, Entity, Property, Variable } from './model/models.js';
+import { Constraint, Entity, Property, StatisticalModifier, Variable } from './model/models.js';
 
 const NS = {
   iop:  'https://w3id.org/iadopt/ont/',
@@ -126,7 +126,7 @@ export default async function extract( content ) {
       SELECT DISTINCT
         ?prop ?value ?label ?comment ?target
       WHERE {
-        VALUES ?prop { iop:hasContextObject iop:hasConstraint }
+        VALUES ?prop { iop:hasContextObject iop:hasConstraint iop:hasStatisticalModifier }
         VALUES ?labelProp   { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
         VALUES ?commentProp { ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( ' ' )} }
 
@@ -144,25 +144,37 @@ export default async function extract( content ) {
         // entity
         const entity = binding.get( 'value' ).value;
         if( !(entity in entities) ) {
-          if( key.includes( 'hasConstraint') ) {
+          switch( true ) {
 
             // Constraint
-            entities[ entity ] = new Constraint({
-              iri:      entity,
-              shortIri: getPrefixed( prefixes, entity ),
-              isBlank:  binding.get( 'value' ).termType == 'BlankNode'
-            });
-            entry.addConstraint( entities[ entity ] );
-
-          } else {
+            case key.includes( 'hasConstraint'):
+              entities[ entity ] = new Constraint({
+                iri:      entity,
+                shortIri: getPrefixed( prefixes, entity ),
+                isBlank:  binding.get( 'value' ).termType == 'BlankNode'
+              });
+              entry.addConstraint( entities[ entity ] );
+              break;
 
             // ContextObject
-            entities[ entity ] = new Entity({
-              iri:      entity,
-              shortIri: getPrefixed( prefixes, entity ),
-              isBlank:  binding.get( 'value' ).termType == 'BlankNode'
-            });
-            entry.addContextObject( entities[ entity ] );
+            case key.includes( 'hasContextObject'):
+              entities[ entity ] = new Entity({
+                iri:      entity,
+                shortIri: getPrefixed( prefixes, entity ),
+                isBlank:  binding.get( 'value' ).termType == 'BlankNode'
+              });
+              entry.addContextObject( entities[ entity ] );
+              break;
+
+            // StatisticalModifier
+            case key.includes( 'hasStatisticalModifier'):
+              entities[ entity ] = new StatisticalModifier({
+                iri:      entity,
+                shortIri: getPrefixed( prefixes, entity ),
+                isBlank:  binding.get( 'value' ).termType == 'BlankNode'
+              });
+              entry.addStatisticalModifier( entities[ entity ] );
+              break;
 
           }
         }
@@ -184,7 +196,14 @@ export default async function extract( content ) {
           // get the target of the constraint
           const target = binding.get( 'target' ).value;
           if( target ) {
-            entry.addConstraint( entities[ entity ],entities[ target ] );
+            // some validation
+            if( !(entity in entities) ) {
+              throw new Error( 'Reference to undefined constraint!' );
+            }
+            if( !(target in entities) ) {
+              throw new Error( 'Reference to undefined target of constraint!' );
+            }
+            entry.addConstraint( entities[ entity ], entities[ target ] );
           }
 
         }

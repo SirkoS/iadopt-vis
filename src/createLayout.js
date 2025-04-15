@@ -2,16 +2,17 @@ import Cfg from './config.js';
 import calcBoxWidth from './createLayout/equalWidth.js';
 import getTextDims from './createLayout/getTextDims.js';
 import splitText from './createLayout/splitText.js';
-import { Entity, Property, Variable } from './model/models.js';
+import { Entity, Property, StatisticalModifier, Variable } from './model/models.js';
 
 // labels for arrows connecting Variable and the direct properties
 const ARROW_LABELS = {
-  'Property':     'hasProperty',
-  'Matrix':       'hasMatrix',
-  'ContextObject':'hasContextObject',
-  'OoI':          'hasObjectOfInterest',
-  constrains:     'constrains',
-  hasconstraint:  'hasConstraint',
+  'Property':             'hasProperty',
+  'Matrix':               'hasMatrix',
+  'ContextObject':        'hasContextObject',
+  'OoI':                  'hasObjectOfInterest',
+  'StatisticalModifier':  'hasStatisticalModifier',
+  constrains:             'constrains',
+  hasConstraint:          'hasConstraint',
 };
 
 /**
@@ -44,6 +45,7 @@ export default function createLayout( data ) {
   const components = [
     data.getObjectOfInterest(),
     data.getMatrix(),
+    data.getStatisticalModifer(),
     ... data.getContextObjects(),
     data.getProperty()
   ]. filter( (c) => c );
@@ -55,7 +57,10 @@ export default function createLayout( data ) {
   for( const obj of components ) {
 
     // add the box
-    box = getBox( obj instanceof Property ? 'Property' : 'Entity', obj, startY );
+    const type = obj instanceof Property
+                  ? 'Property'
+                  : obj instanceof StatisticalModifier ? 'Stat. Mod.' : 'Entity';
+    box = getBox( type, obj, startY );
     result.boxes.push( box );
 
     // add the corresponding arrow
@@ -150,7 +155,7 @@ export default function createLayout( data ) {
     const x = parent.box.x + parent.box.width + 0.5 * Cfg.layout.entity.horMargin;
     let constraint = constraints[0];
     arrow = {
-      text: ARROW_LABELS.hasconstraint,
+      text: ARROW_LABELS.hasConstraint,
       path: [
         { x: x, y: variableBox.y + variableBox.height },
         { x: x, y: constraint.box.y + 0.5 * constraint.box.height },
@@ -158,7 +163,7 @@ export default function createLayout( data ) {
       ],
       x:    x,
       y:    variableBox.y + variableBox.height + 0.5 * (parent.box.y - variableBox.y - variableBox.height) + 20,
-      dim:  getTextDims( ARROW_LABELS.hasconstraint ),
+      dim:  getTextDims( ARROW_LABELS.hasConstraint ),
       type: 'hasConstraint',
       rotate: true,
     };
@@ -276,7 +281,7 @@ function getBox( type, data, initialY ) {
     y:              initialY,
     height:         startY - initialY,
     descSeparator:  descSeparator,
-    className:      type.toLowerCase(),
+    className:      type.toLowerCase().replace( /[^a-z]*/gi, '' ),
     texts: [
       // box header (type)
       {

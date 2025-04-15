@@ -200,6 +200,8 @@ export class Variable extends Concept {
   #ooi;
   /** @type {Concept} */
   #matrix;
+  /** @type {Concept} */
+  #statisticalModifier;
   /** @type {Array.<Concept>} */
   #context = [];
   /** @type {Array.<Constraint>} */
@@ -243,6 +245,19 @@ export class Variable extends Concept {
     matrix.setVariable( this );
     matrix.setRole( 'Matrix' );
     this.#matrix = matrix;
+  }
+
+
+  /**
+   * @param {Entity} statModifier
+   */
+  addStatisticalModifier( statModifier ) {
+    if( !(statModifier instanceof Entity) ) {
+      throw new Error( 'Can only assign instances of Entity!' );
+    }
+    statModifier.setVariable( this );
+    statModifier.setRole( 'StatisticalModifier' );
+    this.#statisticalModifier = statModifier;
   }
 
 
@@ -325,6 +340,15 @@ export class Variable extends Concept {
    */
   getMatrix() {
     return this.#matrix;
+  }
+
+
+  /**
+   *
+   * @returns {Entity}
+   */
+  getStatisticalModifer() {
+    return this.#statisticalModifier;
   }
 
 
@@ -493,5 +517,12 @@ export class Property extends Concept {
   ) + `
 ]`;
   }
+
+}
+
+
+/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+
+export class StatisticalModifier extends Entity {
 
 }
