@@ -501,7 +501,7 @@ export class Entity extends Concept {
 
 /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 
-export class Property extends Concept {
+export class Property extends Entity {
 
   toString() {
     return `[Entity ${ this._iri ? `(${this._iri})` : '(_blank)' }`

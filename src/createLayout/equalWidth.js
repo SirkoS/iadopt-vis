@@ -13,7 +13,7 @@ import getTextDims from './getTextDims.js';
 export default function calcBoxWidth( boxes ) {
 
   // effective total width accounts for outer margins
-  const effWidth = Cfg.layout.width - 2 * Cfg.layout.margin;
+  const effWidth = Cfg.layout.width - 2 * Cfg.layout.margin - Cfg.layout.entity.horMargin;
 
   // calc width
   // for each box assign one horMargin and then compensate for the one superfluous one
@@ -24,8 +24,9 @@ export default function calcBoxWidth( boxes ) {
   // assign to all boxes
   for( const [ index, box ] of Object.entries( boxes ) ) {
     box.width = width;
-    box.x = Cfg.layout.margin                                    // outer margin
-            + index * ( width + Cfg.layout.entity.horMargin );   // previous boxes in that row
+    box.x = Cfg.layout.margin                                     // outer margin
+            + 0.5 * Cfg.layout.entity.horMargin                   // horizontal margin to account for Constraints on Properties
+            + index * ( width + Cfg.layout.entity.horMargin );    // previous boxes in that row
   }
 
   return boxes;

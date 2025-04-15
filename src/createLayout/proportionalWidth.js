@@ -17,6 +17,7 @@ export default function calcBoxWidth( boxes ) {
   // effective total width accounts for outer margins and the distance between the boxes
   const effWidth = Cfg.layout.width
                     - 2 * Cfg.layout.margin
+                    - Cfg.layout.entity.horMargin
                     - (boxes.length - 1) * Cfg.layout.entity.horMargin;
 
   // initialize width for each box
@@ -40,7 +41,7 @@ export default function calcBoxWidth( boxes ) {
     dynBoxes[i].box.x     = leftStart;
     dynBoxes[i].box.width = dynBoxes[i].width;
 
-    leftStart += Cfg.layout.entity.horMargin + dynBoxes[i].width;
+    leftStart += Cfg.layout.entity.horMargin + Cfg.layout.entity.horMargin + dynBoxes[i].width;
 
   }
 
