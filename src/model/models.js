@@ -34,12 +34,12 @@ export class Concept {
    * @param {string}    p.shortIri
    * @param {Localized} p.label
    * @param {Localized} p.comment
-   * @param {boolean}   p.isblank
+   * @param {boolean}   p.isBlank
    */
-  constructor({ iri, shortIri, label, comment } = {}) {
+  constructor({ iri, shortIri, label, comment, isBlank } = {}) {
     this._iri      = iri;
     this._shortIri = shortIri;
-    this._isBlank  = !iri;
+    this._isBlank  = isBlank ?? !iri;
 
     // prune empty labels/comments before adding
     this._label    = Object.fromEntries( Object.entries( label ?? {} ).filter( ([_, val]) => val ) );

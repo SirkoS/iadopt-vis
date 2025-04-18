@@ -411,7 +411,7 @@ function getBox( type, data, initialY ) {
         y: initialY + Cfg.layout.entity.header.height * 1.5,
         text: data.getLabel(),
         className: 'title',
-        link: data.getShortIri() ? undefined : data.getIri(),
+        link: data.isBlank() || data.getShortIri() ? undefined : data.getIri(),
       },
       // description
       ... lines
