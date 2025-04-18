@@ -2,7 +2,7 @@ import Cfg from './config.js';
 import calcBoxWidth from './createLayout/equalWidth.js';
 import getTextDims from './createLayout/getTextDims.js';
 import splitText from './createLayout/splitText.js';
-import { Constraint, Entity, Property, StatisticalModifier, Variable } from './model/models.js';
+import { Constraint, Property, Variable } from './model/models.js';
 
 // labels for arrows connecting Variable and the direct properties
 const ARROW_LABELS = {
@@ -11,8 +11,8 @@ const ARROW_LABELS = {
   'ContextObject':        'hasContextObject',
   'OoI':                  'hasObjectOfInterest',
   'StatisticalModifier':  'hasStatisticalModifier',
-  constrains:             'constrains',
-  hasConstraint:          'hasConstraint',
+  'constrains':           'constrains',
+  'hasConstraint':        'hasConstraint',
 };
 
 /**
@@ -59,7 +59,7 @@ export default function createLayout( data ) {
     // add the box
     const type = obj instanceof Property
                   ? 'Property'
-                  : obj instanceof StatisticalModifier ? 'Stat. Mod.'
+                  : obj.getRole() == 'StatisticalModifier' ? 'Stat. Mod.'
                     : obj.isSystem() ? 'System' : 'Entity';
     box = getBox( type, obj, startY );
     result.boxes.push( box );

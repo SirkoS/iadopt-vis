@@ -568,10 +568,3 @@ export class Property extends Entity {
   }
 
 }
-
-
-/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
-
-export class StatisticalModifier extends Entity {
-
-}

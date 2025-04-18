@@ -32,32 +32,36 @@
           @prefix iop: <https://w3id.org/iadopt/ont/> .
           @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-          ex:C6 a iop:Variable ;
-              rdfs:label "Mass_flux_of_carbon_into_soil_from_vegetation_due_to_senescence" ;
+          ex:C2 a iop:Variable ;
+              rdfs:label "Air daily maximum temperature" ;
               iop:hasConstraint [ a iop:Constraint ;
-                      rdfs:label "senescence" ;
-                      iop:constrains ex:C6_Matrix_SysA7 ] ;
-              iop:hasMatrix ex:C6_Matrix7 ;
-              iop:hasObjectOfInterest ex:C6_OoI7 ;
-              iop:hasProperty ex:C6_Prop7 .
+                      rdfs:label "daily" ;
+                      iop:constrains ex:C2_Mod1 ],
+                  [ a iop:Constraint ;
+                      rdfs:label "1,7 m aboveground" ;
+                      iop:constrains ex:C2_OoI1 ] ;
+              iop:hasContextObject ex:C2_Context1 ;
+              iop:hasMatrix ex:C2_Matrix1 ;
+              iop:hasObjectOfInterest ex:C2_OoI1 ;
+              iop:hasProperty ex:C2_Prop1 ;
+              iop:hasStatisticalModifier ex:C2_Mod1 .
 
-          ex:C6_Matrix7 a iop:Entity,
-                  iop:System ;
-              rdfs:label "vegetation-soil system" ;
-              iop:from ex:C6_Matrix_SysA7 ;
-              iop:to ex:C6_Matrix_SysB7 .
+          ex:C2_Context1 a iop:Entity ;
+              rdfs:label "atmosphere" .
 
-          ex:C6_Matrix_SysB7 a iop:Entity ;
-              rdfs:label "soil" .
+          ex:C2_Matrix1 a iop:Entity ;
+              rdfs:label "atmospheric state" .
 
-          ex:C6_OoI7 a iop:Entity ;
-              rdfs:label "carbon" .
+          ex:C2_Mod1 a iop:StatisticalModifier ;
+              rdfs:label "Maximum" .
 
-          ex:C6_Prop7 a iop:Property ;
-              rdfs:label "mass flux" .
+          ex:C2_OoI1 a iop:Entity ;
+              rdfs:label "air" .
 
-          ex:C6_Matrix_SysA7 a iop:Entity ;
-              rdfs:label "vegetation" .
+          ex:C2_Prop1 a iop:Property ;
+              rdfs:label "temperature" .
+
+
           </textarea>
 
       </div>

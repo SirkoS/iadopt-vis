@@ -1,6 +1,6 @@
 import N3 from 'n3';
 import { QueryEngine } from '@comunica/query-sparql-rdfjs';
-import { Constraint, Entity, Property, StatisticalModifier, Variable } from './model/models.js';
+import { Constraint, Entity, Property, Variable } from './model/models.js';
 
 const NS = {
   iop:  'https://w3id.org/iadopt/ont/',
@@ -23,7 +23,7 @@ const PROP_MAP = {
 };
 
 /**
- * Parse a TTL representation of the Variable to the internal object format
+ * Parse a RDF representation of the Variable to the internal object format
  * @param   {string} content  TTL representation of the Variable
  * @returns {object}          Object representation of the Variable
  */
@@ -40,18 +40,14 @@ export default async function extract( content ) {
   const result = {};
   const entities = {};
 
-  /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Uniques XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+  /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Variable XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 
-  const variableStream = await engine.queryBindings(`
+  let stream = await engine.queryBindings(`
     PREFIX iop: <${NS.iop}>
 
     SELECT DISTINCT
-      ?variable ?ooi ?prop ?matrix
-      ?variableLabel ?variableComment
-      ?ooiLabel ?ooiComment
-      ?propLabel ?propComment
-      ?matrixLabel ?matrixComment
-      ?isSystem
+      ?variable
+      ?label ?comment
     WHERE {
       VALUES ?labelProp { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
       VALUES ?commentProp { ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( ' ' )} }
@@ -59,21 +55,12 @@ export default async function extract( content ) {
       ?variable a iop:Variable ;
                 iop:hasObjectOfInterest  ?ooi ;
                 iop:hasProperty          ?prop .
-      OPTIONAL { ?variable  ?labelProp    ?variableLabel . }
-      OPTIONAL { ?variable  ?commentProp  ?variableComment . }
-      OPTIONAL { ?ooi       ?labelProp    ?ooiLabel . }
-      OPTIONAL { ?ooi       ?commentProp  ?ooiComment . }
-      OPTIONAL { ?prop      ?labelProp    ?propLabel . }
-      OPTIONAL { ?prop      ?commentProp  ?propComment . }
-      OPTIONAL {
-        ?variable iop:hasMatrix ?matrix .
-        OPTIONAL { ?matrix ?labelProp    ?matrixLabel . }
-        OPTIONAL { ?matrix ?commentProp  ?matrixComment . }
-      }
+      OPTIONAL { ?variable  ?labelProp    ?label . }
+      OPTIONAL { ?variable  ?commentProp  ?comment . }
     }`, { sources: [graph] });
-  for await (const binding of variableStream) {
+  for await (const binding of stream) {
 
-    // get variable
+    // build variable
     const variable = binding.get('variable').value;
     if( !(variable in result) ) {
       result[ variable ] = new Variable({
@@ -85,43 +72,117 @@ export default async function extract( content ) {
     const entry = result[ variable ];
     entities[ variable ] = entry;
 
-    // add unique properties
-    for( const key of [ 'ooi', 'prop', 'matrix' ] ) {
-      const value = binding.get( key )?.value;
-      if( value ) {
-        if( !(value in entities) ) {
-          entities[ value ] = new (key == 'prop' ? Property : Entity)({
-            iri:      value,
-            shortIri: getPrefixed( prefixes, value ),
-            isBlank:  binding.get( key ).termType == 'BlankNode',
-          });
-        }
-        switch( key ) {
-          case 'ooi':
-            entry.setObjectOfInterest( entities[ value ] );
-            break;
-          case 'prop':
-            entry.setProperty( entities[ value ] );
-            break;
-          case 'matrix':
-            entry.setMatrix( entities[ value ] );
-            break;
-        }
-      }
+    // add labels & descriptions
+    let value = binding.get( 'label' );
+    if( value ) {
+      entities[ variable ].setLabel( value.language, value.value );
+    }
+    value = binding.get( 'comment' )?.value;
+    if( value ) {
+      entities[ variable ].setComment( value.language, value.value );
     }
 
-    // add labels & descriptions
-    for( const key of ['variable', 'ooi', 'prop', 'matrix' ]) {
-      const entity = binding.get( key )?.value;
-      if( entity ) {
-        let value = binding.get( key + 'Label' );
-        if( value ) {
-          entities[ entity ].setLabel( value.language, value.value );
+
+    /* XXXXXXXXXXXXXXXXXXXXXXXXXXXX Components XXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+
+    stream = await engine.queryBindings(`
+      PREFIX iop: <${NS.iop}>
+
+      SELECT DISTINCT
+        ?prop ?value ?label ?comment
+      WHERE {
+        VALUES ?prop {
+          iop:hasMatrix
+          iop:hasObjectOfInterest
+          iop:hasContextObject
+          iop:hasStatisticalModifier
         }
-        value = binding.get( key + 'Comment' )?.value;
-        if( value ) {
-          entities[ entity ].setComment( value.language, value.value );
+        VALUES ?labelProp   { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
+        VALUES ?commentProp { ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( ' ' )} }
+
+        <${variable}> ?prop ?value .
+        OPTIONAL{ ?value ?labelProp   ?label . }
+        OPTIONAL{ ?value ?commentProp ?comment . }
+      }
+      ORDER BY DESC(?prop)`, { sources: [graph] });
+
+    // add non-unique properties
+    for await ( const binding of stream ) {
+
+      const key = binding.get('prop')?.value;
+
+      // entity
+      const entity = binding.get( 'value' ).value;
+      if( !(entity in entities) ) {
+
+        // determine type of class
+        const Type = key.includes('hasProperty') ? Property : Entity;
+
+        // create entity object
+        entities[ entity ] = new Type({
+          iri:      entity,
+          shortIri: getPrefixed( prefixes, entity ),
+          isBlank:  binding.get( 'value' ).termType == 'BlankNode'
+        });
+
+        // attach it with the correct role
+        switch( true ) {
+
+          // Property
+          case key.includes( 'hasProperty' ):
+            entry.setProperty( entities[ entity ] );
+            break;
+
+          // Matrix
+          case key.includes( 'hasMatrix' ):
+            entry.setMatrix( entities[ entity ] );
+            break;
+
+          // ObjectOfInterest
+          case key.includes( 'hasObjectOfInterest' ):
+            entry.setObjectOfInterest( entities[ entity ] );
+            break;
+
+          // ContextObject
+          case key.includes( 'hasContextObject' ):
+            entry.addContextObject( entities[ entity ] );
+            break;
+
+          // StatisticalModifier
+          case key.includes( 'hasStatisticalModifier' ):
+            entry.addStatisticalModifier( entities[ entity ] );
+            break;
+
         }
+      }
+
+      // label
+      let value = binding.get( 'label' );
+      if( value ) {
+        entities[ entity ].setLabel( value.language, value.value );
+      }
+      // description
+      value = binding.get( 'comment' )?.value;
+      if( value ) {
+        entities[ entity ].setComment( value.language, value.value );
+      }
+
+      // constrains
+      if( key.includes( 'hasConstraint' ) ) {
+
+        // get the target of the constraint
+        const target = binding.get( 'target' ).value;
+        if( target ) {
+          // some validation
+          if( !(entity in entities) ) {
+            throw new Error( 'Reference to undefined constraint!' );
+          }
+          if( !(target in entities) ) {
+            throw new Error( 'Reference to undefined target of constraint!' );
+          }
+          entry.addConstraint( entities[ entity ], entities[ target ] );
+        }
+
       }
 
     }
@@ -187,97 +248,62 @@ export default async function extract( content ) {
     }
 
 
-    /* XXXXXXXXXXXXXXXXXXXXXXXXXXXX Non-Uniques XXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+    /* XXXXXXXXXXXXXXXXXXXXXXXXXXXX Constraints XXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 
     const propStream = await engine.queryBindings(`
       PREFIX iop: <${NS.iop}>
 
       SELECT DISTINCT
-        ?prop ?value ?label ?comment ?target
+        ?constraint ?label ?comment ?target
       WHERE {
-        VALUES ?prop { iop:hasContextObject iop:hasConstraint iop:hasStatisticalModifier }
         VALUES ?labelProp   { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
         VALUES ?commentProp { ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( ' ' )} }
 
-        <${variable}> ?prop ?value .
-        OPTIONAL{ ?value ?labelProp   ?label . }
-        OPTIONAL{ ?value ?commentProp ?comment . }
-        OPTIONAL{ ?value iop:constrains ?target . }
+        <${variable}> iop:hasConstraint ?constraint .
+        OPTIONAL{ ?constraint ?labelProp   ?label . }
+        OPTIONAL{ ?constraint ?commentProp ?comment . }
+        OPTIONAL{ ?constraint iop:constrains ?target . }
       }`, { sources: [graph] });
 
     // add non-unique properties
     for await ( const binding of propStream ) {
-      const key = binding.get('prop')?.value;
-      if( key ) {
 
-        // entity
-        const entity = binding.get( 'value' ).value;
-        if( !(entity in entities) ) {
-          switch( true ) {
-
-            // Constraint
-            case key.includes( 'hasConstraint'):
-              entities[ entity ] = new Constraint({
-                iri:      entity,
-                shortIri: getPrefixed( prefixes, entity ),
-                isBlank:  binding.get( 'value' ).termType == 'BlankNode'
-              });
-              entry.addConstraint( entities[ entity ] );
-              break;
-
-            // ContextObject
-            case key.includes( 'hasContextObject'):
-              entities[ entity ] = new Entity({
-                iri:      entity,
-                shortIri: getPrefixed( prefixes, entity ),
-                isBlank:  binding.get( 'value' ).termType == 'BlankNode'
-              });
-              entry.addContextObject( entities[ entity ] );
-              break;
-
-            // StatisticalModifier
-            case key.includes( 'hasStatisticalModifier'):
-              entities[ entity ] = new StatisticalModifier({
-                iri:      entity,
-                shortIri: getPrefixed( prefixes, entity ),
-                isBlank:  binding.get( 'value' ).termType == 'BlankNode'
-              });
-              entry.addStatisticalModifier( entities[ entity ] );
-              break;
-
-          }
-        }
-
-        // label
-        let value = binding.get( 'label' );
-        if( value ) {
-          entities[ entity ].setLabel( value.language, value.value );
-        }
-        // description
-        value = binding.get( 'comment' )?.value;
-        if( value ) {
-          entities[ entity ].setComment( value.language, value.value );
-        }
-
-        // constrains
-        if( key.includes( 'hasConstraint' ) ) {
-
-          // get the target of the constraint
-          const target = binding.get( 'target' ).value;
-          if( target ) {
-            // some validation
-            if( !(entity in entities) ) {
-              throw new Error( 'Reference to undefined constraint!' );
-            }
-            if( !(target in entities) ) {
-              throw new Error( 'Reference to undefined target of constraint!' );
-            }
-            entry.addConstraint( entities[ entity ], entities[ target ] );
-          }
-
-        }
+      // entity
+      const entity = binding.get( 'constraint' ).value;
+      if( !(entity in entities) ) {
+        entities[ entity ] = new Constraint({
+          iri:      entity,
+          shortIri: getPrefixed( prefixes, entity ),
+          isBlank:  binding.get( 'constraint' ).termType == 'BlankNode'
+        });
+        entry.addConstraint( entities[ entity ] );
 
       }
+
+      // label
+      let value = binding.get( 'label' );
+      if( value ) {
+        entities[ entity ].setLabel( value.language, value.value );
+      }
+      // description
+      value = binding.get( 'comment' )?.value;
+      if( value ) {
+        entities[ entity ].setComment( value.language, value.value );
+      }
+
+      // get the target of the constraint
+      const target = binding.get( 'target' ).value;
+      if( target ) {
+        // some validation
+        if( !(entity in entities) ) {
+          throw new Error( 'Reference to undefined constraint!' );
+        }
+        if( !(target in entities) ) {
+          throw new Error( 'Reference to undefined target of constraint!' );
+        }
+        entry.addConstraint( entities[ entity ], entities[ target ] );
+      }
+
     }
 
   }
