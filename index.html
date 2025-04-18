@@ -28,51 +28,36 @@
       <div class="tab-pane fade show active" id="rdf-tab-pane" role="tabpanel" aria-labelledby="rdf-tab" tabindex="0">
 
         <textarea id="input" class="font-monospace">
-          @prefix pato:   <http://purl.obolibrary.org/obo/> .
-          @prefix p01:    <http://vocab.nerc.ac.uk/collection/P01/current/> .
-          @prefix s06:    <http://vocab.nerc.ac.uk/collection/S06/current/> .
-          @prefix s12:    <http://vocab.nerc.ac.uk/collection/S12/current/> .
-          @prefix s27:    <http://vocab.nerc.ac.uk/collection/S27/current/> .
-          @prefix worms:  <https://marinespecies.org/aphia.php?p=taxdetails&id=> .
-          @prefix iop:    <https://w3id.org/iadopt/ont/> .
-          @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
-          @prefix ex:     <http://www.example.org/> .
+          @prefix ex: <http://example.org/iadopt/challenge/> .
+          @prefix iop: <https://w3id.org/iadopt/ont/> .
+          @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-          p01:IC000344 a iop:Variable ;
-            rdfs:label              "concentration of endosulfane sulfate in wet flesh of ostrea edulis"@en ;
-            iop:hasProperty         s06:S0600045 ;
-            iop:hasObjectOfInterest s27:CS003625 ;
-            iop:hasMatrix           s12:S1214 ;
-            iop:hasContextObject    worms:140658 ;
-            iop:hasStatisticalModifier ex:Median ;
-            iop:hasConstraint       [
-              a pato:PATO_0001823 ;
-              rdfs:label      "wet"@en ;
-              iop:constrains  s12:S1214
-            ], [
-              a ex:Daily ;
-              rdfs:label      "daily"@en ;
-              iop:constrains  ex:Median
-            ], [
-              a ex:Relative ;
-              rdfs:label      "relative"@en ;
-              iop:constrains  s06:S0600045
-            ] .
+          ex:C6 a iop:Variable ;
+              rdfs:label "Mass_flux_of_carbon_into_soil_from_vegetation_due_to_senescence" ;
+              iop:hasConstraint [ a iop:Constraint ;
+                      rdfs:label "senescence" ;
+                      iop:constrains ex:C6_Matrix_SysA7 ] ;
+              iop:hasMatrix ex:C6_Matrix7 ;
+              iop:hasObjectOfInterest ex:C6_OoI7 ;
+              iop:hasProperty ex:C6_Prop7 .
 
-          s06:S0600045 a iop:Property ;
-            rdfs:label "Concentration"@en .
+          ex:C6_Matrix7 a iop:Entity,
+                  iop:System ;
+              rdfs:label "vegetation-soil system" ;
+              iop:from ex:C6_Matrix_SysA7 ;
+              iop:to ex:C6_Matrix_SysB7 .
 
-          s27:CS003625 a iop:Entity ;
-            rdfs:label "endosulfan sulfate"@en .
+          ex:C6_Matrix_SysB7 a iop:Entity ;
+              rdfs:label "soil" .
 
-          s12:S1214 a iop:Entity ;
-            rdfs:label "flesh"@en .
+          ex:C6_OoI7 a iop:Entity ;
+              rdfs:label "carbon" .
 
-          worms:140658 a iop:Entity ;
-            rdfs:label "Ostrea edulis"@en .
+          ex:C6_Prop7 a iop:Property ;
+              rdfs:label "mass flux" .
 
-          ex:Median a iop:StatisticalModifier ;
-            rdfs:label "Median" .
+          ex:C6_Matrix_SysA7 a iop:Entity ;
+              rdfs:label "vegetation" .
           </textarea>
 
       </div>

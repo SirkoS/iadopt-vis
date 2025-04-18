@@ -347,7 +347,7 @@ export class Variable extends Concept {
    *
    * @returns {Entity}
    */
-  getStatisticalModifer() {
+  getStatisticalModifier() {
     return this.#statisticalModifier;
   }
 
@@ -448,6 +448,8 @@ export class Entity extends Concept {
 
   /** @typedef {Array.<Constraint>} */
   #constrained = [];
+  /** @typedef {Object.<String, Array.<Entity>>} */
+  #systemComponents = {};
 
 
   /**
@@ -465,6 +467,53 @@ export class Entity extends Concept {
    */
   getConstraints() {
     return Array.from( this.#constrained );
+  }
+
+
+  /**
+   *
+   * @param {String} property
+   * @param {Entity} component
+   */
+  addComponent( property, component ) {
+    if( !(property in this.#systemComponents) ) {
+      this.#systemComponents[ property ] = [];
+    }
+    component.setVariable( this.getVariable() );
+    component.setRole( 'SystemComponent' );
+    this.#systemComponents[ property ].push( component );
+  }
+
+
+  /**
+   *
+   * @returns {Object.<String, Array.<Entity>>}
+   */
+  getComponents( property, component ) {
+    // return a copy of the internal object
+    return Object.entries( this.#systemComponents )
+      .reduce( (result, entry) => {
+        result[ entry[0] ] = Array.from( entry[1] );
+        return result;
+      }, {} );
+  }
+
+  /**
+   *
+   * @returns {number}
+   */
+  getComponentCount() {
+    return Object.entries( this.#systemComponents )
+      .reduce( (sum, entry) => sum + entry[1].length, 0 );
+  }
+
+
+  /**
+   *
+   * @returns {Boolean}
+   */
+  isSystem() {
+    return Object.keys( this.#systemComponents ).length > 0;
   }
 
 

@@ -15,6 +15,11 @@ const PROP_MAP = {
   matrix:     [ NS.iop + 'hasMatrix' ],
   context:    [ NS.iop + 'hasContextObject' ],
   constraint: [ NS.iop + 'hasConstraint' ],
+  sysComps:   [
+    NS.iop + 'from',
+    NS.iop + 'to',
+    NS.iop + 'part',
+  ],
 };
 
 /**
@@ -35,7 +40,8 @@ export default async function extract( content ) {
   const result = {};
   const entities = {};
 
-  // first query: unique properties
+  /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Uniques XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+
   const variableStream = await engine.queryBindings(`
     PREFIX iop: <${NS.iop}>
 
@@ -45,6 +51,7 @@ export default async function extract( content ) {
       ?ooiLabel ?ooiComment
       ?propLabel ?propComment
       ?matrixLabel ?matrixComment
+      ?isSystem
     WHERE {
       VALUES ?labelProp { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
       VALUES ?commentProp { ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( ' ' )} }
@@ -119,7 +126,69 @@ export default async function extract( content ) {
 
     }
 
-    // get non-unique properties
+
+    /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Systems XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+
+    const varProps = [
+      ... PROP_MAP.matrix, ... PROP_MAP.ooi, ... PROP_MAP.context
+    ];
+    const sysStream = await engine.queryBindings(`
+      PREFIX iop: <${NS.iop}>
+
+      SELECT DISTINCT
+        ?varProp ?system ?sysClass ?sysProp ?sysComp ?label ?comment
+      WHERE {
+        VALUES ?varProp  { ${varProps.map( (el) => `<${el}>` ).join( ' ' )} }
+        VALUES ?sysClass { iop:System }
+        VALUES ?sysProp  { ${PROP_MAP.sysComps.map( (el) => `<${el}>` ).join( ' ' )} }
+        VALUES ?labelProp   { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
+        VALUES ?commentProp { ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( ' ' )} }
+
+        <${variable}> ?varProp ?system .
+        ?system a        ?sysClass ;
+                ?sysProp ?sysComp .
+
+        OPTIONAL{ ?sysComp ?labelProp   ?label . }
+        OPTIONAL{ ?sysComp ?commentProp ?comment . }
+      }`, { sources: [graph] });
+
+    for await ( const binding of sysStream ) {
+
+      // build an entity for the component
+      const compIri = binding.get( 'sysComp' );
+      const entity = new Entity({
+        iri:      compIri?.value,
+        shortIri: getPrefixed( prefixes, compIri?.value ),
+        isBlank:  compIri.termType == 'BlankNode',
+      });
+      entities[ entity.getIri() ] = entity;
+
+      // add labels & descriptions
+      let value = binding.get( 'label' );
+      if( value ) {
+        entity.setLabel( value.language, value.value );
+      }
+      value = binding.get( 'comment' )?.value;
+      if( value ) {
+        entity.setComment( value.language, value.value );
+      }
+
+      // link to parent component
+      const parentIri = binding.get( 'system' )?.value;
+      const parent = entities[ parentIri ];
+      if( !parent ) {
+        throw new Error( 'Could not extract parent of system component' );
+      }
+      parent.addComponent(
+        binding.get( 'sysProp' )?.value,
+        entity
+      );
+
+    }
+
+
+    /* XXXXXXXXXXXXXXXXXXXXXXXXXXXX Non-Uniques XXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+
     const propStream = await engine.queryBindings(`
       PREFIX iop: <${NS.iop}>
 

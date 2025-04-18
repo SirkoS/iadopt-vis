@@ -23,6 +23,9 @@ export default {
       // vertical distance between two boxes
       vertMargin: 80,
 
+      // vertical distance between system and its components
+      vertMarginMedium: 60,
+
       // vertical distance between entity and its constraints
       vertMarginSmall: 40,
 

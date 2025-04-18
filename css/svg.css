@@ -45,11 +45,14 @@ rect.title {
 .property rect.title  { fill:   #B266FF; }
 .property .frame      { stroke: #B266FF; }
 
-/* ----------------- Entity ------------------ */
+/* ------------ Entity / System -------------- */
 
-.entity rect        { fill:   #DAE8FC; }
-.entity rect.title  { fill:   #6C8EBF; }
-.entity .frame      { stroke: #6C8EBF; }
+.entity rect,
+.system rect         { fill:   #DAE8FC; }
+.entity rect.title
+.system rect.title   { fill:   #6C8EBF; }
+.entity .frame,
+.system .frame       { stroke: #6C8EBF; }
 
 /* ---------- Statistical Modifier ----------- */
 

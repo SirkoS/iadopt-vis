@@ -2,7 +2,7 @@ import Cfg from './config.js';
 import calcBoxWidth from './createLayout/equalWidth.js';
 import getTextDims from './createLayout/getTextDims.js';
 import splitText from './createLayout/splitText.js';
-import { Entity, Property, StatisticalModifier, Variable } from './model/models.js';
+import { Constraint, Entity, Property, StatisticalModifier, Variable } from './model/models.js';
 
 // labels for arrows connecting Variable and the direct properties
 const ARROW_LABELS = {
@@ -45,7 +45,7 @@ export default function createLayout( data ) {
   const components = [
     data.getObjectOfInterest(),
     data.getMatrix(),
-    data.getStatisticalModifer(),
+    data.getStatisticalModifier(),
     ... data.getContextObjects(),
     data.getProperty()
   ]. filter( (c) => c );
@@ -53,13 +53,14 @@ export default function createLayout( data ) {
   // calculate widths for each box
   calcBoxWidth( components );
 
-  // entries for all single valued components
+  // entries for all components
   for( const obj of components ) {
 
     // add the box
     const type = obj instanceof Property
                   ? 'Property'
-                  : obj instanceof StatisticalModifier ? 'Stat. Mod.' : 'Entity';
+                  : obj instanceof StatisticalModifier ? 'Stat. Mod.'
+                    : obj.isSystem() ? 'System' : 'Entity';
     box = getBox( type, obj, startY );
     result.boxes.push( box );
 
@@ -76,6 +77,41 @@ export default function createLayout( data ) {
       type: obj.getRole(),
     };
     result.arrows.push( arrow );
+
+    // account for systems
+    if( obj.isSystem() ) {
+      const sysComponents = obj.getComponents();
+      for( const key of Object.keys( sysComponents ) ) {
+
+        for( const sysComp of sysComponents[ key ] ) {
+
+          // determine where to start vertically
+          const startY = obj.startY
+                          ?? obj.box.y + obj.box.height
+                             + Cfg.layout.entity.vertMarginMedium;
+
+          // add the box
+          box = getBox( 'Entity', sysComp, startY );
+          result.boxes.push( box );
+
+          // add the corresponding arrow
+          const label = key.split( '/' ).pop();
+          arrow = {
+            text: label,
+            path: [
+              { x: box.x + 0.5 * box.width, y: obj.box.y + obj.box.height },
+              { x: box.x + 0.5 * box.width, y: box.y - 6 },
+            ],
+            x:    box.x + 0.5 * box.width,
+            y:    obj.box.y + obj.box.height + 0.5 * (box.y - obj.box.y - obj.box.height) - 3,
+            dim:  getTextDims( label ),
+            type: 'system component',
+          };
+          result.arrows.push( arrow );
+        }
+
+      }
+    }
 
   }
 
@@ -142,8 +178,7 @@ export default function createLayout( data ) {
   }
 
   // add hasConstraint arrows, if needed
-  const entities = components.filter( (c) => c instanceof Entity );
-  for( const parent of entities ) {
+  for( const parent of components ) {
 
     // skip for entities without constraints
     const constraints = parent.getConstraints();
@@ -188,6 +223,86 @@ export default function createLayout( data ) {
         type: 'hasConstraint',
       };
       result.arrows.push( arrow );
+    }
+
+  }
+
+  // add hasConstraint arrows for _systems_, if needed
+  for( const system of components.filter( (c) => c.isSystem() ) ) {
+
+    // get all constrains
+    /** @type {Array.<Constraint>} */
+    const constraints = Object.values( system.getComponents() )
+      .flatMap( (s) => s )
+      .flatMap( (s) => s.getConstraints() );
+
+    // skip for systems without constraints
+    if( !constraints.length ) {
+      continue;
+    }
+
+    // get overall left-most constraint
+    const leftConstraint = constraints.reduce( (left, cur) => (left.box.x < cur.box.x ? left : cur), constraints[0] );
+    // get overall bottom-most constraint
+    const botConstraint = constraints.reduce( (bot, cur) => (bot.box.y < cur.box.y ? bot : cur), constraints[0] );
+
+    // add arrow start as a frame (includes label)
+    const x = system.box.x + system.box.width + 0.5 * Cfg.layout.entity.horMargin;
+    const maxY = botConstraint.box.y + botConstraint.box.height + Cfg.layout.entity.vertMarginTiny;
+    let constraint = constraints[0];
+    arrow = {
+      text: ARROW_LABELS.hasConstraint,
+      path: [
+        {
+          x: x,
+          y: variableBox.y + variableBox.height,
+        }, {
+          x: x,
+          y: maxY,
+        }, {
+          x: leftConstraint.box.x + 0.5 * leftConstraint.box.width,
+          y: maxY,
+        },
+      ],
+      x:    x,
+      y:    variableBox.y + variableBox.height + 0.5 * (system.box.y - variableBox.y - variableBox.height) + 20,
+      dim:  getTextDims( ARROW_LABELS.hasConstraint ),
+      type: 'hasConstraint',
+      rotate: true,
+      hideHead: true,
+    };
+    result.arrows.push( arrow );
+
+    // arrows to the bottom most constraint per system component
+    for( const sysComponent of Object.values( system.getComponents() ).flatMap( (c) => c ) ) {
+
+      // get all constraints
+      const constraints = sysComponent.getConstraints();
+
+      // skip those without constraints
+      if( constraints.length < 1 ){
+        continue;
+      }
+
+      // get bottom-most constraint
+      const botConstraint = constraints.reduce( (bot, cur) => (bot.box.y < cur.box.y ? bot : cur), constraints[0] );
+
+      // add the missing arrow bit
+      arrow = {
+        path: [
+          {
+            x: botConstraint.box.x + 0.5 * botConstraint.box.width,
+            y: maxY,
+          }, {
+
+            x: botConstraint.box.x + 0.5 * botConstraint.box.width,
+            y: botConstraint.box.y + botConstraint.box.height + 6,
+          },
+        ],
+        type: 'hasConstraint',
+      };
+      result.arrows.push( arrow );
+
     }
 
   }

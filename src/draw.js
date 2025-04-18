@@ -13,9 +13,17 @@ export default function draw( div, layout ) {
   // grab copyright footer
   const footer = div.querySelector( '#footer' );
 
+  // get the maximum y value for scaling
+  const maxY = Math.max(
+    // by boxes
+    Math.max( ... layout.boxes.map( (el) => el.y + el.height ) ),
+    // by arrows
+    Math.max( ... layout.arrows.flatMap( (a) => a.path.map( (p) => p.y ) ) )
+  );
+
   // get overall SVG height
   const height = Cfg.layout.margin // margin on bottom; top-margin is included in the box layouts
-    + Math.max( ... layout.boxes.map( (el) => el.y + el.height ) ); // last y-coordinate of a box
+    + maxY; // maximum y-coordinate used
 
   // main SVG container
   const svg = createElement( 'svg', {
