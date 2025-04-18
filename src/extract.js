@@ -1,6 +1,6 @@
-import N3 from 'n3';
 import { QueryEngine } from '@comunica/query-sparql-rdfjs';
 import { Constraint, Entity, Property, Variable } from './model/models.js';
+import { parseRDF } from './parse.js';
 
 const NS = {
   iop:  'https://w3id.org/iadopt/ont/',
@@ -14,23 +14,24 @@ const PROP_MAP = {
   prop:       [ NS.iop + 'hasProperty' ],
   matrix:     [ NS.iop + 'hasMatrix' ],
   context:    [ NS.iop + 'hasContextObject' ],
+  modifier:   [ NS.iop + 'hasStatisticalModifier' ],
   constraint: [ NS.iop + 'hasConstraint' ],
   sysComps:   [
-    NS.iop + 'from',
-    NS.iop + 'to',
-    NS.iop + 'part',
+    NS.iop + 'hasSource',
+    NS.iop + 'hasTarget',
+    NS.iop + 'hasPart',
   ],
 };
 
 /**
  * Parse a RDF representation of the Variable to the internal object format
- * @param   {string} content  TTL representation of the Variable
- * @returns {object}          Object representation of the Variable
+ * @param   {string}                      content  TTL representation of the Variable
+ * @returns {Promise.<Array.<Variable>>}           list of parsed Variables in content
  */
 export default async function extract( content ) {
 
   // parse into graph
-  const {store: graph, prefixes } = await parseContent( content );
+  const {store: graph, prefixes } = await parseRDF( content );
 
   // initialize engine
   const engine = new QueryEngine();
@@ -92,9 +93,10 @@ export default async function extract( content ) {
         ?prop ?value ?label ?comment
       WHERE {
         VALUES ?prop {
+          iop:hasContextObject
           iop:hasMatrix
           iop:hasObjectOfInterest
-          iop:hasContextObject
+          iop:hasProperty
           iop:hasStatisticalModifier
         }
         VALUES ?labelProp   { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
@@ -167,31 +169,14 @@ export default async function extract( content ) {
         entities[ entity ].setComment( value.language, value.value );
       }
 
-      // constrains
-      if( key.includes( 'hasConstraint' ) ) {
-
-        // get the target of the constraint
-        const target = binding.get( 'target' ).value;
-        if( target ) {
-          // some validation
-          if( !(entity in entities) ) {
-            throw new Error( 'Reference to undefined constraint!' );
-          }
-          if( !(target in entities) ) {
-            throw new Error( 'Reference to undefined target of constraint!' );
-          }
-          entry.addConstraint( entities[ entity ], entities[ target ] );
-        }
-
-      }
-
     }
 
 
     /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Systems XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 
     const varProps = [
-      ... PROP_MAP.matrix, ... PROP_MAP.ooi, ... PROP_MAP.context
+      ... PROP_MAP.ooi, ... PROP_MAP.matrix, ... PROP_MAP.context,
+      ... PROP_MAP.modifier, ... PROP_MAP.prop
     ];
     const sysStream = await engine.queryBindings(`
       PREFIX iop: <${NS.iop}>
@@ -216,11 +201,11 @@ export default async function extract( content ) {
     for await ( const binding of sysStream ) {
 
       // build an entity for the component
-      const compIri = binding.get( 'sysComp' );
+      const component = binding.get( 'sysComp' );
       const entity = new Entity({
-        iri:      compIri?.value,
-        shortIri: getPrefixed( prefixes, compIri?.value ),
-        isBlank:  compIri.termType == 'BlankNode',
+        iri:      component?.value,
+        shortIri: getPrefixed( prefixes, component?.value ),
+        isBlank:  component.termType == 'BlankNode',
       });
       entities[ entity.getIri() ] = entity;
 
@@ -312,41 +297,6 @@ export default async function extract( content ) {
   return Object.values( result );
 
 }
-
-/**
- * @typedef  {Object} ParseResponse
- * @property {N3.Store}                 store     store holding graph data
- * @property {object.<string, string>}  prefixes  map of prefixes
- */
-
-/**
- * parse a given RDF-string into a graph store
- * @param   {String}                  content   RDF-compliant data
- * @returns {Promise.<ParseResponse>}           parsed data
- */
-function parseContent( content ) {
-  return new Promise( (resolve, reject) => {
-    const parser = new N3.Parser();
-    const store = new N3.Store();
-    parser.parse( content,
-                  (error, quad, prefixes) => {
-
-                    // errors
-                    if( error ) {
-                      reject( error );
-                    }
-
-                    // content
-                    if (quad) {
-                      store.add( quad );
-                    } else {
-                      resolve( { store, prefixes } );
-                    }
-
-                  });
-  });
-}
-
 
 
 /**

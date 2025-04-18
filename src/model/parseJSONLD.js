@@ -32,6 +32,11 @@ export default function parseJSONLD( data ) {
     variable.setMatrix( ent );
     lookup[ ent.getIri() ] = ent;
   }
+  ent = parseConcept( data['statisticalModifier'], Entity );
+  if (ent) {
+    variable.getStatisticalModifier( ent );
+    lookup[ ent.getIri() ] = ent;
+  }
   if( data['context'] ) {
     for( const d of data['context'] ) {
       ent = parseConcept( d, Entity );

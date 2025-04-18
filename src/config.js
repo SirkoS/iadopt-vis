@@ -4,7 +4,7 @@ export default {
   layout: {
 
     // overall dimensions
-    width:  800,
+    width:  850,
     margin:  10,
 
     // height of a line of text

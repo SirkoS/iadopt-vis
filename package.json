@@ -23,6 +23,7 @@
   "dependencies": {
     "@comunica/query-sparql-rdfjs": "^3.2.3",
     "bootstrap": "^5.3.3",
-    "n3": "^1.21.0"
+    "n3": "^1.21.0",
+    "rdfxml-streaming-parser": "^3.0.1"
   }
 }
