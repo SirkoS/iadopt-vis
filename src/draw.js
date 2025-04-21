@@ -27,7 +27,7 @@ export default function draw( div, layout ) {
 
   // main SVG container
   const svg = createElement( 'svg', {
-    'viewBox': `0 0 ${Cfg.layout.width} ${height + (footer ? 20 : 0)}`
+    'viewBox': `0 0 ${Cfg.layout.width} ${height + (footer ? 30 : 0)}`
   });
 
   // some fixed components

@@ -30,12 +30,22 @@ import '../css/svg.css';
     const layout = await createLayout( data );
 
     // get SVG container
-    const svg = document.querySelector( '#svg' );
+    const container = document.querySelector( '#svg' );
     // svg.innerHTML = '';
 
     // draw it
-    draw( svg, layout );
-    svg.querySelector( 'svg' ).setAttribute( 'preserveAspectRatio', 'xMidYMin' );
+    draw( container, layout );
+    const svg = container.querySelector( 'svg' );
+    svg.setAttribute( 'preserveAspectRatio', 'xMidYMin' );
+
+    // update host document about dimensions
+    const dims = svg.getAttribute('viewBox').split( ' ' );
+    window.top.postMessage({
+      height: dims[3],
+      width: dims[2],
+    }, {
+      targetOrigin: '*',
+    });
 
   }
 

@@ -61,16 +61,21 @@ export default function toJSONLD( variable ) {
  * Entity may be a System. Here, all subcomponents are serialized as well
  *
  * @param   {import('./models').Entity}   ent
- * @returns {Object}
+ * @returns {Object|void}
  */
 function serializeEntity( ent ) {
+
+  // just return for empty object
+  if( !ent ) {
+    return;
+  }
 
   // basic structure
   const result = {
     '@type': [ 'https://w3id.org/iadopt/ont/Entity' ],
-    '@id':    ent?.getIri(),
-    label:    ent?.getLabel(),
-    comment:  ent?.getComment(),
+    '@id':    ent.getIri(),
+    label:    ent.getLabel(),
+    comment:  ent.getComment(),
   };
 
   // get components, if existing
