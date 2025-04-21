@@ -2,6 +2,11 @@
  * @typedef {Object.<string, string>} Localized
  */
 
+export const VALID_SYSTEM_PROPERTIES = [
+  'hasSource',
+  'hasTarget',
+  'hasPart'
+];
 
 
 export class Concept {
@@ -13,7 +18,7 @@ export class Concept {
 
   /** @type {string} */
   _iri;
-  /** @type {string} */
+  /** @type {string?} */
   _shortIri;
   /** @type {Localized} */
   _label = {};
@@ -31,7 +36,7 @@ export class Concept {
    *
    * @param {object}    p
    * @param {string}    p.iri
-   * @param {string}    p.shortIri
+   * @param {string?}   p.shortIri
    * @param {Localized} p.label
    * @param {Localized} p.comment
    * @param {boolean}   p.isBlank
@@ -42,8 +47,16 @@ export class Concept {
     this._isBlank  = isBlank ?? !iri;
 
     // prune empty labels/comments before adding
-    this._label    = Object.fromEntries( Object.entries( label ?? {} ).filter( ([_, val]) => val ) );
-    this._comment  = Object.fromEntries( Object.entries( comment ?? {} ).filter( ([_, val]) => val ) );
+    if( typeof label === 'string' ) {
+      this._label[ '' ] = label;
+    } else {
+      this._label    = Object.fromEntries( Object.entries( label ?? {} ).filter( ([_, val]) => val ) );
+    }
+    if( typeof comment === 'string' ) {
+      this._comment[ '' ] = comment;
+    } else {
+      this._comment  = Object.fromEntries( Object.entries( comment ?? {} ).filter( ([_, val]) => val ) );
+    }
 
   }
 
@@ -251,7 +264,7 @@ export class Variable extends Concept {
   /**
    * @param {Entity} statModifier
    */
-  addStatisticalModifier( statModifier ) {
+  setStatisticalModifier( statModifier ) {
     if( !(statModifier instanceof Entity) ) {
       throw new Error( 'Can only assign instances of Entity!' );
     }
@@ -296,7 +309,7 @@ export class Variable extends Concept {
       for( const entity of entities ) {
         if( !assignedEntities.includes( entity ) ) {
           constraint.addEntity( entity );
-          entity.addConstraint( constraint );
+          entity._addConstraint( constraint );
         }
       }
 
@@ -307,7 +320,7 @@ export class Variable extends Concept {
     // add reverse links
     for ( const entity of entities ) {
       constraint.addEntity( entity );
-      entity.addConstraint( constraint );
+      entity._addConstraint( constraint );
     }
 
     constraint.setRole( 'Constraint' );
@@ -452,7 +465,37 @@ export class Entity extends Concept {
   #systemComponents = {};
 
 
+
   /**
+   * @override
+   * @param {Variable} variable
+   */
+  setVariable( variable ){
+
+    // set variable for this entity
+    super.setVariable( variable );
+
+    // set variable for all components
+    Object.values( this.#systemComponents )
+      .forEach( (values) =>
+        values.forEach( (v) => v.setVariable( variable ) )
+      );
+
+  }
+
+  /**
+   * add backlinks for Variables to Constraints
+   *
+   * @private
+   * @param {Constraint} constraint
+   */
+  _addConstraint( constraint ) {
+    this.#constrained.push( constraint );
+  }
+
+
+  /**
+   * add a Constraint to this Entity
    *
    * @param {Constraint} constraint
    */
@@ -472,10 +515,14 @@ export class Entity extends Concept {
 
   /**
    *
-   * @param {String} property
+   * @param {string} property
    * @param {Entity} component
    */
   addComponent( property, component ) {
+    // validate property
+    if( !VALID_SYSTEM_PROPERTIES.includes( property ) ) {
+      throw new Error( 'Invalid property to connect a System to its components: ' + property );
+    }
     if( !(property in this.#systemComponents) ) {
       this.#systemComponents[ property ] = [];
     }
@@ -487,9 +534,9 @@ export class Entity extends Concept {
 
   /**
    *
-   * @returns {Object.<String, Array.<Entity>>}
+   * @returns {Object.<string, Array.<Entity>>}
    */
-  getComponents( property, component ) {
+  getComponents() {
     // return a copy of the internal object
     return Object.entries( this.#systemComponents )
       .reduce( (result, entry) => {

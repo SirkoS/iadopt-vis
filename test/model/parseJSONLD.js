@@ -39,8 +39,6 @@ describe( 'model.parseJSONLD', function() {
     // labels
     assert.equal( result.getLabel(), 'concentration of endosulfane sulfate in wet flesh of ostrea edulis', 'should return the correct label' );
 
-
   } );
-
 
 });

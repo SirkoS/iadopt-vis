@@ -38,6 +38,7 @@ export default async function extract( content ) {
 
   // collect all Variables
   // variables might have multiple response rows
+  /** @type {Object.<string, Variable>} */
   const result = {};
   const entities = {};
 
@@ -62,7 +63,10 @@ export default async function extract( content ) {
   for await (const binding of stream) {
 
     // build variable
-    const variable = binding.get('variable').value;
+    const variable = binding.get('variable')?.value;
+    if( !variable ) {
+      continue;
+    }
     if( !(variable in result) ) {
       result[ variable ] = new Variable({
         iri:      variable,
@@ -152,7 +156,7 @@ export default async function extract( content ) {
 
           // StatisticalModifier
           case key.includes( 'hasStatisticalModifier' ):
-            entry.addStatisticalModifier( entities[ entity ] );
+            entry.setStatisticalModifier( entities[ entity ] );
             break;
 
         }
@@ -226,7 +230,7 @@ export default async function extract( content ) {
         throw new Error( 'Could not extract parent of system component' );
       }
       parent.addComponent(
-        binding.get( 'sysProp' )?.value,
+        binding.get( 'sysProp' )?.value.replace( NS.iop, '' ),
         entity
       );
 
