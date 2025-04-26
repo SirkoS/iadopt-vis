@@ -40,6 +40,7 @@ export default async function extract( content ) {
   // variables might have multiple response rows
   /** @type {Object.<string, Variable>} */
   const result = {};
+  /** @type {Object.<string, Concept>} */
   const entities = {};
 
   /* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Variable XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
@@ -200,7 +201,9 @@ export default async function extract( content ) {
 
         OPTIONAL{ ?sysComp ?labelProp   ?label . }
         OPTIONAL{ ?sysComp ?commentProp ?comment . }
-      }`, { sources: [graph] });
+      }
+      ORDER BY ?sysComp
+        `, { sources: [graph] });
 
     for await ( const binding of sysStream ) {
 
@@ -211,6 +214,19 @@ export default async function extract( content ) {
         shortIri: getPrefixed( prefixes, component?.value ),
         isBlank:  component.termType == 'BlankNode',
       });
+
+      // skip, if we already know this system component here
+      const parentIri = binding.get( 'system' )?.value;
+      /** @type {Entity} */
+      const parent = entities[ parentIri ];
+      const siblings = Object
+        .values( parent.getComponents() )
+        .flatMap( (el) => el );
+      if( siblings.some( (sib) => sib.getIri() == entity.getIri() ) ) {
+        continue;
+      }
+
+      // other wise, register
       entities[ entity.getIri() ] = entity;
 
       // add labels & descriptions
@@ -224,8 +240,6 @@ export default async function extract( content ) {
       }
 
       // link to parent component
-      const parentIri = binding.get( 'system' )?.value;
-      const parent = entities[ parentIri ];
       if( !parent ) {
         throw new Error( 'Could not extract parent of system component' );
       }
