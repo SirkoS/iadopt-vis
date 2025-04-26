@@ -111,12 +111,18 @@ export default function draw( div, layout ) {
       class:  'header',
     }) );
 
+    // get height of title area
+    const titleTextsPositions = box.texts
+      .filter( (l) => l.className == 'title' )
+      .map( (el) => el.y );
+    const titleHeight = Math.max( ... titleTextsPositions ) - box.y - Cfg.layout.lineHeight;
+
     // title
     container.appendChild( createElement( 'rect', {
       x:      box.x,
       y:      box.y + Cfg.layout.entity.header.height,
       width:  box.width,
-      height: Cfg.layout.entity.header.height,
+      height: titleHeight,
       class:  'title',
     }) );
 

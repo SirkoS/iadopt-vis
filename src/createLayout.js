@@ -331,7 +331,20 @@ function getBox( type, data, initialY ) {
 
   // prepare description texts
   const lines = [];
-  let startY = initialY + 2.5 * Cfg.layout.entity.header.height;
+  let startY = initialY + 1 * Cfg.layout.entity.header.height;
+
+  // append label as header
+  const headerLines = layoutText({ text: data.getLabel(), startY, boxWidth, boxCenter })
+    .map( (line) => ({
+      ... line,
+      className: 'title',
+      link: data.isBlank() || data.getShortIri() ? undefined : data.getIri(),
+    }));
+  startY = headerLines[ headerLines.length - 1 ].y + Cfg.layout.lineHeight;
+
+  // append separator between header and remaining description
+  let descSeparator = startY;
+  startY += Cfg.layout.lineHeight;
 
   // append prefixed IRI, if available
   if( data.getShortIri() ) {
@@ -344,46 +357,12 @@ function getBox( type, data, initialY ) {
     });
     startY += Cfg.layout.lineHeight;
   }
-  let descSeparator = startY;
 
   // append description, if available
   if( data.getComment() ) {
-
-    // split description until it fits the box width
-    let commentWidth = getTextDims( data.getComment() );
-    let comment = [ data.getComment() ];
-    const maxWidth = boxWidth - 2 * Cfg.layout.entity.textMargin;
-    while( commentWidth.width > maxWidth ) {
-
-      // next split
-      comment = splitText( data.getComment(), comment.length + 1 );
-
-      // max line length
-      commentWidth = comment.reduce( (max, el) => {
-        const dims = getTextDims( el );
-        return dims.width > max.width ? dims : max;
-      }, { width: 0 } );
-
-    }
-
-    // add all lines of the description
-    startY += Cfg.layout.lineHeight;
-    for( const line of comment ) {
-      lines.push({
-        x: boxCenter,
-        y: startY,
-        text:       line,
-        className:  'desc',
-      });
-      startY += Cfg.layout.lineHeight;
-    }
-
+    lines.push( ... layoutText({ text: data.getComment(), startY, boxWidth, boxCenter }) );
+    startY = lines[ lines.length - 1 ].y + Cfg.layout.lineHeight;
   }
-
-  // do we need the separator between IRI and an additional description?
-  descSeparator = data.getShortIri() && data.getComment()
-    ? descSeparator
-    : null;
 
   // if there's no description, remove the space again
   if( lines.length < 1 ) {
@@ -407,13 +386,7 @@ function getBox( type, data, initialY ) {
         className: 'type',
       },
       // box header (name of entity)
-      {
-        x: boxCenter,
-        y: initialY + Cfg.layout.entity.header.height * 1.5,
-        text: data.getLabel(),
-        className: 'title',
-        link: data.isBlank() || data.getShortIri() ? undefined : data.getIri(),
-      },
+      ... headerLines,
       // description
       ... lines
     ],
@@ -424,4 +397,57 @@ function getBox( type, data, initialY ) {
 
   return box;
 
+}
+
+
+/**
+ * @typedef TextLineLayout
+ */
+
+/**
+ * return the proper layout for this text fragment,
+ * possibly breaking it into multiple lines
+ *
+ * @param   {object}  p
+ * @param   {string}  p.text
+ * @param   {number}  p.startY
+ * @param   {number}  p.boxWidth
+ * @param   {number}  p.boxCenter
+ * @returns {Array<TextLineLayout>}
+ */
+function layoutText({ text, startY, boxWidth, boxCenter }) {
+
+  /** @type {Array<TextLineLayout>} */
+  const lines = [];
+
+  // split description until it fits the box width
+  let commentWidth = getTextDims( text );
+  let comment = [ text ];
+  const maxWidth = boxWidth - 2 * Cfg.layout.entity.textMargin;
+  while( commentWidth.width > maxWidth ) {
+
+    // next split
+    comment = splitText( text, comment.length + 1 );
+
+    // max line length
+    commentWidth = comment.reduce( (max, el) => {
+      const dims = getTextDims( el );
+      return dims.width > max.width ? dims : max;
+    }, { width: 0 } );
+
+  }
+
+  // add all lines of the description
+  startY += Cfg.layout.lineHeight;
+  for( const line of comment ) {
+    lines.push({
+      x: boxCenter,
+      y: startY,
+      text:       line,
+      className:  'desc',
+    });
+    startY += Cfg.layout.lineHeight;
+  }
+
+  return lines;
 }
