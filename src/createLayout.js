@@ -367,6 +367,7 @@ function getBox( type, data, initialY ) {
     }
 
     // add all lines of the description
+    startY += Cfg.layout.lineHeight;
     for( const line of comment ) {
       lines.push({
         x: boxCenter,

@@ -52,14 +52,11 @@ export default async function extract( content ) {
       ?variable
       ?label ?comment
     WHERE {
-      VALUES ?labelProp { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
-      VALUES ?commentProp { ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( ' ' )} }
-
       ?variable a iop:Variable ;
                 iop:hasObjectOfInterest  ?ooi ;
                 iop:hasProperty          ?prop .
-      OPTIONAL { ?variable  ?labelProp    ?label . }
-      OPTIONAL { ?variable  ?commentProp  ?comment . }
+      OPTIONAL { ?variable  ${PROP_MAP.label.map( (el) => `<${el}>` ).join( '|' )}    ?label . }
+      OPTIONAL { ?variable  ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( '|' )}  ?comment . }
     }`, { sources: [graph] });
   for await (const binding of stream) {
 
@@ -81,11 +78,11 @@ export default async function extract( content ) {
     // add labels & descriptions
     let value = binding.get( 'label' );
     if( value ) {
-      entities[ variable ].setLabel( value.language, value.value );
+      entry.setLabel( value.language, value.value );
     }
-    value = binding.get( 'comment' )?.value;
+    value = binding.get( 'comment' );
     if( value ) {
-      entities[ variable ].setComment( value.language, value.value );
+      entry.setComment( value.language, value.value );
     }
 
 
@@ -192,15 +189,13 @@ export default async function extract( content ) {
         VALUES ?varProp  { ${varProps.map( (el) => `<${el}>` ).join( ' ' )} }
         VALUES ?sysClass { iop:System }
         VALUES ?sysProp  { ${PROP_MAP.sysComps.map( (el) => `<${el}>` ).join( ' ' )} }
-        VALUES ?labelProp   { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
-        VALUES ?commentProp { ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( ' ' )} }
 
         <${variable}> ?varProp ?system .
         ?system a        ?sysClass ;
                 ?sysProp ?sysComp .
 
-        OPTIONAL{ ?sysComp ?labelProp   ?label . }
-        OPTIONAL{ ?sysComp ?commentProp ?comment . }
+        OPTIONAL{ ?sysComp ${PROP_MAP.label.map( (el) => `<${el}>` ).join( '|' )}   ?label . }
+        OPTIONAL{ ?sysComp ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( '|' )} ?comment . }
       }
       ORDER BY ?sysComp
         `, { sources: [graph] });
@@ -259,12 +254,10 @@ export default async function extract( content ) {
       SELECT DISTINCT
         ?constraint ?label ?comment ?target
       WHERE {
-        VALUES ?labelProp   { ${PROP_MAP.label.map( (el) => `<${el}>` ).join( ' ' )} }
-        VALUES ?commentProp { ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( ' ' )} }
-
         <${variable}> iop:hasConstraint ?constraint .
-        OPTIONAL{ ?constraint ?labelProp   ?label . }
-        OPTIONAL{ ?constraint ?commentProp ?comment . }
+
+        OPTIONAL{ ?constraint ${PROP_MAP.label.map( (el) => `<${el}>` ).join( '|' )}   ?label . }
+        OPTIONAL{ ?constraint ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( '|' )} ?comment . }
         OPTIONAL{ ?constraint iop:constrains ?target . }
       }`, { sources: [graph] });
 
