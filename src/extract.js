@@ -199,7 +199,8 @@ export default async function extract( content ) {
       }
       ORDER BY ?sysComp
         `, { sources: [graph] });
-
+    /** @type {Set<Entity>} */
+    const systems = new Set(); // collect all systems for post-processing
     for await ( const binding of sysStream ) {
 
       // build an entity for the component
@@ -214,6 +215,7 @@ export default async function extract( content ) {
       const parentIri = binding.get( 'system' )?.value;
       /** @type {Entity} */
       const parent = entities[ parentIri ];
+      systems.add( parent );
       const siblings = Object
         .values( parent.getComponents() )
         .flatMap( (el) => el );
@@ -245,6 +247,16 @@ export default async function extract( content ) {
 
     }
 
+    // hacky workaround for SymmetricSystems that use the same entity twice
+    // N3Store does (currently) not support duplicate triples which are used in these cases
+    // so we make the assumption here that in symmetric systems with only one component,
+    // this one component needs to be duplicated
+    for( const system of systems ) {
+      const componentMap = system.getComponents();
+      if( ('hasPart' in componentMap) && (componentMap['hasPart'].length == 1) ) {
+        system.addComponent( 'hasPart', componentMap['hasPart'][0].clone() );
+      }
+    }
 
     /* XXXXXXXXXXXXXXXXXXXXXXXXXXXX Constraints XXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 
