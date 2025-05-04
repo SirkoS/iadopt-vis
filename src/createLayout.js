@@ -119,66 +119,6 @@ export default function createLayout( data ) {
   for( const obj of components ) {
     layoutConstraints( obj, result );
   }
-  // for( const constraint of data.getConstraints() ) {
-
-  //   // copy part of the dimensions from parent box (aka the entity being constrained)
-  //   // TODO layout in case multiple entities are constrained by a single constraint
-  //   const parent = constraint.getEntities()[0];
-  //   constraint.x = parent.box.x;
-  //   constraint.width = parent.box.width;
-
-  //   // determine where to start vertically
-  //   const startY = parent.startY
-  //                   ?? parent.box.y + parent.box.height
-  //                      + Cfg.layout.entity.vertMarginSmall;
-
-  //   // add the box
-  //   box = getBox( 'Constraint', constraint, startY );
-  //   result.boxes.push( box );
-
-  //   // add the corresponding arrow
-  //   if( !parent.startY ) {
-
-  //     // full arrow only for the first constraint
-  //     arrow = {
-  //       text: ARROW_LABELS.constrains,
-  //       path: [
-  //         { x: box.x + 0.5 * box.width, y: box.y },
-  //         {
-  //           x: parent.box.x + 0.5 * parent.box.width,
-  //           y: parent.box.y + parent.box.height + 6
-  //         },
-  //       ],
-  //       x:    box.x + 0.5 * box.width,
-  //       y:    parent.box.y + parent.box.height + 0.5 * (box.y - parent.box.y - parent.box.height) + 5,
-  //       dim:  getTextDims( ARROW_LABELS.constrains ),
-  //       type: 'constrains',
-  //     };
-
-  //   } else {
-
-  //     // later ones get only a path fragment
-  //     arrow = {
-  //       path: [
-  //         { x: box.x + 0.5 * box.width, y: box.y },
-  //         {
-  //           x: parent.box.x + 0.5 * parent.box.width,
-  //           y: parent.startY - Cfg.layout.entity.vertMarginTiny, // account for the distance to next-higher box
-  //         },
-  //       ],
-  //       x:    box.x + 0.5 * box.width,
-  //       y:    parent.box.y + parent.box.height + 0.5 * (box.y - parent.box.y - parent.box.height) + 5,
-  //       type: 'constrains',
-  //       hideHead: true,
-  //     };
-
-  //   }
-  //   result.arrows.push( arrow );
-
-  //   // adjust parent start, if more constraints are coming
-  //   parent.startY = box.y + box.height + Cfg.layout.entity.vertMarginTiny;
-
-  // }
 
   // add hasConstraint arrows, if needed
   for( const parent of components ) {
@@ -471,20 +411,20 @@ function layoutConstraints(parent, result) {
                   ?? parent.box.y + parent.box.height
                       + Cfg.layout.entity.vertMarginSmall;
 
-  for( const constraint of parent.getConstraints() ) {
-
-    // in case of system, process all components first
-    if( parent.isSystem() ) {
-      const sysComponents = parent.getComponents();
-      for( const key of Object.keys( sysComponents ) ) {
-        for( const sysComp of sysComponents[ key ] ) {
-          startY = Math.max(
-            layoutConstraints( sysComp, result ),
-            startY
-          );
-        }
+  // in case of system, process all components first
+  if( parent.isSystem() ) {
+    const sysComponents = parent.getComponents();
+    for( const key of Object.keys( sysComponents ) ) {
+      for( const sysComp of sysComponents[ key ] ) {
+        startY = Math.max(
+          layoutConstraints( sysComp, result ),
+          startY
+        );
       }
     }
+  }
+
+  for( const constraint of parent.getConstraints() ) {
 
     // copy part of the dimensions from parent box (aka the entity being constrained)
     // TODO layout in case multiple entities are constrained by a single constraint

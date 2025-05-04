@@ -33,7 +33,7 @@
           @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
           ex:C6 a iop:Variable ;
-              rdfs:label "Mass_flux_of_carbon_into_soil_from_vegetation_due_to_senescence" ;
+              rdfs:label "Mass flux of carbon into soil from vegetation due to senescence" ;
               ex:issue "https://github.com/i-adopt/examples/issues/23" ;
               iop:hasConstraint [ a iop:Constraint ;
                       rdfs:label "due to senescence" ;
@@ -48,9 +48,6 @@
               iop:hasSource ex:C6_Matrix_SysA7 ;
               iop:hasTarget ex:C6_Matrix_SysB7 .
 
-          ex:C6_Matrix_SysB7 a iop:Entity ;
-              rdfs:label "soil" .
-
           ex:C6_OoI7 a iop:Entity ;
               rdfs:label "carbon" .
 
@@ -59,6 +56,9 @@
 
           ex:C6_Matrix_SysA7 a iop:Entity ;
               rdfs:label "vegetation" .
+
+          ex:C6_Matrix_SysB7 a iop:Entity ;
+              rdfs:label "soil" .
           </textarea>
 
       </div>

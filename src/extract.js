@@ -52,9 +52,7 @@ export default async function extract( content ) {
       ?variable
       ?label ?comment
     WHERE {
-      ?variable a iop:Variable ;
-                iop:hasObjectOfInterest  ?ooi ;
-                iop:hasProperty          ?prop .
+      ?variable a iop:Variable .
       OPTIONAL { ?variable  ${PROP_MAP.label.map( (el) => `<${el}>` ).join( '|' )}    ?label . }
       OPTIONAL { ?variable  ${PROP_MAP.comment.map( (el) => `<${el}>` ).join( '|' )}  ?comment . }
     }`, { sources: [graph] });
