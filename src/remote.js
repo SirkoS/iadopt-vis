@@ -1,7 +1,7 @@
 import parseJSONLD from './model/parseJSONLD.js';
-import extract from './extract.js';
-import createLayout from './createLayout.js';
-import draw from './draw.js';
+import extract from './lib/extract.js';
+import createLayout from './lib/createLayout.js';
+import draw from './lib/draw.js';
 
 import '../css/svg.css';
 

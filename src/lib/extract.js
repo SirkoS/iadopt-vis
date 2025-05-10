@@ -1,5 +1,5 @@
 import { QueryEngine } from '@comunica/query-sparql-rdfjs';
-import { Constraint, Entity, Property, Variable } from './model/models.js';
+import { Constraint, Entity, Property, Variable } from '../model/models.js';
 import { parseRDF } from './parse.js';
 
 const NS = {

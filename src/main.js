@@ -4,9 +4,9 @@ import '../css/svg.css';
 import SvgCss  from '../css/svg.css?raw';
 
 
-import draw from './draw.js';
-import extract from './extract.js';
-import createLayout from './createLayout.js';
+import draw from './lib/draw.js';
+import extract from './lib/extract.js';
+import createLayout from './lib/createLayout.js';
 
 import * as bootstrap from 'bootstrap';
 

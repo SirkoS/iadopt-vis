@@ -1,4 +1,4 @@
-import Cfg from '../config.js';
+import Cfg from '../../config.js';
 import { minTextWidth, getTextDims } from './getTextDims.js';
 
 /**

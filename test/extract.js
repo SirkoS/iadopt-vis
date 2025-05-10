@@ -1,4 +1,4 @@
-import extract from '../src/extract.js';
+import extract from '../src/lib/extract.js';
 import { Constraint, Entity, Property, Variable } from '../src/model/models.js';
 import { assert } from 'chai';
 import { promises as Fs } from 'fs';

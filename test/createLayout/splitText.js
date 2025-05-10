@@ -1,5 +1,5 @@
 import { describe } from 'mocha';
-import splitText from '../../src/createLayout/splitText.js';
+import splitText from '../../src/lib/createLayout/splitText.js';
 import { assert } from 'chai';
 
 // manually selected testcases

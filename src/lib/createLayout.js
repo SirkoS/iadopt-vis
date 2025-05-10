@@ -1,8 +1,8 @@
-import Cfg from './config.js';
+import Cfg from '../config.js';
 import calcBoxWidth from './createLayout/equalWidth.js';
 import getTextDims from './createLayout/getTextDims.js';
 import splitText from './createLayout/splitText.js';
-import { Concept, Constraint, Entity, Property, Variable } from './model/models.js';
+import { Constraint, Entity, Property, Variable } from '../model/models.js';
 
 // labels for arrows connecting Variable and the direct properties
 const ARROW_LABELS = {

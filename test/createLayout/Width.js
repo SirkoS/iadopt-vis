@@ -12,7 +12,7 @@ describe.skip( 'property-based testing of width-calculation', function() {
 
     // load respective width-calculating modules
     for( const key in variants ) {
-      variants[ key ] = (await import( `../../src/createLayout/${key}.js` )).calcBoxWidth;
+      variants[ key ] = (await import( `../../src/lib/createLayout/${key}.js` )).calcBoxWidth;
     }
 
   });

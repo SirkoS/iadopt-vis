@@ -1,6 +1,5 @@
-import Cfg from '../config.js';
-import { Entity } from '../model/models.js';
-import getTextDims from './getTextDims.js';
+import Cfg from '../../config.js';
+import { Entity } from '../../model/models.js';
 
 /**
  * horizontally layout for a given set of boxes
