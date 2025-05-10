@@ -157,7 +157,7 @@ export default function draw( div, layout ) {
         });
         anchor.innerHTML = text.text;
         textEl.appendChild( anchor );
-      } else {
+      } else {;
         textEl.innerHTML = text.text;
       }
       container.appendChild( textEl );

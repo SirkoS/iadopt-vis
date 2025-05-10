@@ -1,17 +1,36 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Test Remote Interface</title>
     <style>
-      html, body, iframe, svg {
+      html, body {
         width: 100%;
         height: 100%;
         overflow: hidden;
         margin: 0;
         padding: 0;
+        text-align: center;
+      }
+      iframe {
+        border: 0;
+
+        max-width: 1024px;
+        width: 80vw;
       }
     </style>
   </head>
   <body>
+    <script>
+      function updateVisSize( ev ) {
+        // set the proper iframe ratio
+        const iframe = document.querySelector( 'iframe' );
+        const ratio = ev.data.width / ev.data.height;
+        iframe.style.aspectRatio = ratio;
+        // remove the listener
+        window.removeEventListener( 'message', updateVisSize );
+      }
+      window.addEventListener( 'message', updateVisSize );
+    </script>
     <iframe
       data-src="./remote.html?ttl=%40prefix%20ex%3A%20%3Chttp%3A%2F%2Fexample.org%2Fiadopt%2Fchallenge%2F%3E%20.%20%40prefix%20iop%3A%20%3Chttps%3A%2F%2Fw3id.org%2Fiadopt%2Font%2F%3E%20.%20%40prefix%20rdfs%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%20.%20ex%3AC2%20a%20iop%3AVariable%20%3B%20rdfs%3Alabel%20%22Air%20daily%20maximum%20temperature%22%20%3B%20iop%3AhasConstraint%20%5B%20a%20iop%3AConstraint%20%3B%20rdfs%3Alabel%20%22daily%22%20%3B%20iop%3Aconstrains%20ex%3AC2_Prop1%20%5D%2C%20%5B%20a%20iop%3AConstraint%20%3B%20rdfs%3Alabel%20%221%2C7%20m%20aboveground%22%20%3B%20iop%3Aconstrains%20ex%3AC2_OoI1%20%5D%20%3B%20iop%3AhasContextObject%20ex%3AC2_Context1%20%3B%20iop%3AhasMatrix%20ex%3AC2_Matrix1%20%3B%20iop%3AhasObjectOfInterest%20ex%3AC2_OoI1%20%3B%20iop%3AhasProperty%20ex%3AC2_Prop1%20%3B%20iop%3AhasStatisticalModifier%20ex%3AC2_Mod1%20.%20ex%3AC2_Context1%20a%20iop%3AEntity%20%3B%20rdfs%3Alabel%20%22atmosphere%22%20.%20ex%3AC2_Matrix1%20a%20iop%3AEntity%20%3B%20rdfs%3Alabel%20%22atmospheric%20state%22%20.%20ex%3AC2_Mod1%20a%20iop%3AStatisticalModifier%20%3B%20rdfs%3Alabel%20%22Maximum%22%20.%20ex%3AC2_OoI1%20a%20iop%3AEntity%20%3B%20rdfs%3Alabel%20%22air%22%20.%20ex%3AC2_Prop1%20a%20iop%3AProperty%20%3B%20rdfs%3Alabel%20%22temperature%22%20.%20"
       src="./remote.html?ttl=%40prefix%20ex%3A%20%3Chttp%3A%2F%2Fexample.org%2Fiadopt%2Fchallenge%2F%3E%20.%20%40prefix%20iop%3A%20%3Chttps%3A%2F%2Fw3id.org%2Fiadopt%2Font%2F%3E%20.%20%40prefix%20rdfs%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%20.%20ex%3AC2%20a%20iop%3AVariable%20%3B%20rdfs%3Alabel%20%22Air%20daily%20maximum%20temperature%22%20%3B%20iop%3AhasConstraint%20%5B%20a%20iop%3AConstraint%20%3B%20rdfs%3Alabel%20%22daily%22%20%3B%20iop%3Aconstrains%20ex%3AC2_Prop1%20%5D%2C%20%5B%20a%20iop%3AConstraint%20%3B%20rdfs%3Alabel%20%221%2C7%20m%20aboveground%22%20%3B%20iop%3Aconstrains%20ex%3AC2_OoI1%20%5D%20%3B%20iop%3AhasContextObject%20ex%3AC2_Context1%20%3B%20iop%3AhasMatrix%20ex%3AC2_Matrix1%20%3B%20iop%3AhasObjectOfInterest%20ex%3AC2_OoI1%20%3B%20iop%3AhasProperty%20ex%3AC2_Prop1%20%3B%20iop%3AhasStatisticalModifier%20ex%3AC2_Mod1%20.%20ex%3AC2_Context1%20a%20iop%3AEntity%20%3B%20rdfs%3Alabel%20%22atmosphere%22%20.%20ex%3AC2_Matrix1%20a%20iop%3AEntity%20%3B%20rdfs%3Alabel%20%22atmospheric%20state%22%20.%20ex%3AC2_Mod1%20a%20iop%3AStatisticalModifier%20%3B%20rdfs%3Alabel%20%22Maximum%22%20.%20ex%3AC2_OoI1%20a%20iop%3AEntity%20%3B%20rdfs%3Alabel%20%22air%22%20.%20ex%3AC2_Prop1%20a%20iop%3AProperty%20%3B%20rdfs%3Alabel%20%22temperature%22%20.%20"

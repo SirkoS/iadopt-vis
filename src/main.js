@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import '../css/interface.css';
 import '../css/svg.css';
+import '../css/error.css';
 import SvgCss  from '../css/svg.css?raw';
 
 
@@ -8,18 +9,27 @@ import draw from './lib/draw.js';
 import extract from './lib/extract.js';
 import createLayout from './lib/createLayout.js';
 
+import { showError } from './ui/showError.js';
+
 import * as bootstrap from 'bootstrap';
 
 document.querySelector( '#visualize' )
   .addEventListener( 'click', async () => {
 
+    // get input
+    const raw = document.querySelector( '#input' ).value;
+
     try {
 
-      // get input
-      const raw = document.querySelector( '#input' ).value;
 
       // extract components to visualize
-      const content = await extract( raw );
+      let content;
+      try {
+        content = await extract( raw );
+      } catch( e ) {
+        showError( '#svg', e, 'Parsing', raw );
+        return;
+      }
 
       // create the layout
       const layout = await createLayout( content[0] );
@@ -40,7 +50,7 @@ document.querySelector( '#visualize' )
       svg.scrollIntoView( true );
 
     } catch( e ) {
-      console.error( e );
+      showError( '#svg', e, 'Rendering', raw );
     }
 
   });
