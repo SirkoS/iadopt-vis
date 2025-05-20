@@ -257,7 +257,7 @@ export default function createLayout( data ) {
 /**
  * gather the full layout-data for a box
  * @param   {string}    type        type of the box
- * @param   {Variable}  data        description
+ * @param   {Concept}   data        description
  * @param   {number}    initialY    starting y-coordinate for this level of boxes
  * @returns {object}                layout data
  */
@@ -324,7 +324,7 @@ function getBox( type, data, initialY ) {
       {
         x: boxCenter,
         y: initialY + Cfg.layout.entity.header.height * 0.5,
-        text: type,
+        text: data.getClassLabel(),
         className: 'type',
       },
       // box header (name of entity)
