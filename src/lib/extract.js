@@ -6,10 +6,11 @@ const NS = {
   iop:  'https://w3id.org/iadopt/ont/',
   rdf:  'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
   rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
+  skos: 'http://www.w3.org/2004/02/skos/core#',
 };
 const PROP_MAP = {
-  label:      [ NS.rdfs + 'label' ],
-  comment:    [ NS.rdfs + 'comment', NS.rdfs + 'description' ],
+  label:      [ NS.rdfs + 'label', NS.skos + 'prefLabel' ],
+  comment:    [ NS.rdfs + 'comment', NS.rdfs + 'description', NS.skos + 'definition' ],
   ooi:        [ NS.iop + 'hasObjectOfInterest' ],
   prop:       [ NS.iop + 'hasProperty' ],
   matrix:     [ NS.iop + 'hasMatrix' ],
@@ -298,7 +299,7 @@ export default async function extract( content ) {
       }
 
       // get the target of the constraint
-      const target = binding.get( 'target' ).value;
+      const target = binding.get( 'target' )?.value;
       if( target ) {
         // some validation
         if( !(entity in entities) ) {
@@ -308,6 +309,8 @@ export default async function extract( content ) {
           throw new Error( 'Reference to undefined target of constraint!' );
         }
         entry.addConstraint( entities[ entity ], entities[ target ] );
+      } else {
+        throw new Error( 'No target given in constraint!' );
       }
 
     }
