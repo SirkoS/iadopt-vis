@@ -668,6 +668,10 @@ export class Entity extends Concept {
 
 export class Property extends Entity {
 
+  getClassLabel() {
+    return 'Property';
+  }
+
   toString() {
     return `[Entity ${ this._iri ? `(${this._iri})` : '(_blank)' }`
   + (
