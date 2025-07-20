@@ -108,7 +108,7 @@ export class Concept {
    * @returns {string}
    */
   getIri(){
-    return this._iri;
+    return this._isBlank ? null : this._iri;
   }
 
 
@@ -117,7 +117,7 @@ export class Concept {
    * @returns {string}
    */
   getShortIri(){
-    return this._shortIri;
+    return this._isBlank ? null : this._shortIri;
   }
 
 
@@ -132,8 +132,8 @@ export class Concept {
 
   /**
    *
-   * @params {string} lang
-   * @params {string} label
+   * @param {string} lang
+   * @param {string} label
    */
   setLabel( lang, label ){
     this._label[ lang ] = label;
@@ -168,8 +168,8 @@ export class Concept {
 
   /**
    *
-   * @params {string} lang
-   * @params {string} comment
+   * @param {string} lang
+   * @param {string} comment
    */
   setComment( lang, comment ){
     this._comment[ lang ] = comment;
