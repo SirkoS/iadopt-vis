@@ -47,7 +47,9 @@ export function showError( target, error, source, rdf ) {
 
   // notify parent window
   const dims = box.getClientRects();
-  const margin = box.computedStyleMap().get( 'margin-left' ).value;
+  const margin = box.computedStyleMap
+                  ? box.computedStyleMap().get( 'margin-left' ).value
+                  : +( window.getComputedStyle( box ).marginLeft?.replace( /[^0-9]/gi, '' ) ?? 0);
   const message = {
     height: dims[0].height + 2*margin,
     width: dims[0].width + 2*margin,
