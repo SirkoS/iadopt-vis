@@ -9,6 +9,9 @@ export const VALID_SYMMETRIC_SYSTEM_PROPERTIES = [
 export const VALID_ASYMMETRIC_SYSTEM_PROPERTIES = [
   'hasSource',
   'hasTarget',
+
+  'hasNumerator',
+  'hasDenominator',
 ];
 
 export const VALID_SYSTEM_PROPERTIES = [
@@ -64,6 +67,10 @@ export class Concept {
       this._comment[ '' ] = comment;
     } else {
       this._comment  = Object.fromEntries( Object.entries( comment ?? {} ).filter( ([_, val]) => val ) );
+    }
+
+    if( this instanceof Variable ) {
+      this.#role = 'Variable';
     }
 
   }
