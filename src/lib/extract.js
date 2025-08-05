@@ -1,8 +1,8 @@
 import { QueryEngine } from '@comunica/query-sparql-rdfjs';
-import { Constraint, Entity, Property, Variable } from '../model/models.js';
+import { Constraint, Entity, Property, VALID_SYSTEM_PROPERTIES, Variable } from '../model/models.js';
 import { parseRDF } from './parse.js';
 
-const NS = {
+export const NS = {
   iop:  'https://w3id.org/iadopt/ont/',
   rdf:  'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
   rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
@@ -17,11 +17,12 @@ const PROP_MAP = {
   context:    [ NS.iop + 'hasContextObject' ],
   modifier:   [ NS.iop + 'hasStatisticalModifier' ],
   constraint: [ NS.iop + 'hasConstraint' ],
-  sysComps:   [
-    NS.iop + 'hasSource',
-    NS.iop + 'hasTarget',
-    NS.iop + 'hasPart',
+  systems:    [
+    NS.iop + 'System',
+    NS.iop + 'SymmetricSystem',
+    NS.iop + 'AsymmetricSystem',
   ],
+  sysComps:   VALID_SYSTEM_PROPERTIES.map( (p) => NS.iop + p ),
 };
 
 /**
@@ -33,6 +34,11 @@ export default async function extract( content ) {
 
   // parse into graph
   const {store: graph, prefixes } = await parseRDF( content );
+
+  // add prefixes to namespace list
+  for( const [ prefix, iri ] of Object.entries( prefixes ) ) {
+    NS[ prefix ] = iri;
+  }
 
   // initialize engine
   const engine = new QueryEngine();
@@ -67,7 +73,7 @@ export default async function extract( content ) {
     if( !(variable in result) ) {
       result[ variable ] = new Variable({
         iri:      variable,
-        shortIri: getPrefixed( prefixes, variable ),
+        shortIri: getPrefixed( variable ),
       });
     }
     /** @type {Variable} */
@@ -124,7 +130,7 @@ export default async function extract( content ) {
         // create entity object
         entities[ entity ] = new Type({
           iri:      entity,
-          shortIri: getPrefixed( prefixes, entity ),
+          shortIri: getPrefixed( entity ),
           isBlank:  binding.get( 'value' ).termType == 'BlankNode'
         });
 
@@ -186,7 +192,7 @@ export default async function extract( content ) {
         ?varProp ?system ?sysClass ?sysProp ?sysComp ?label ?comment
       WHERE {
         VALUES ?varProp  { ${varProps.map( (el) => `<${el}>` ).join( ' ' )} }
-        VALUES ?sysClass { iop:System }
+        VALUES ?sysClass { ${PROP_MAP.systems.map( (el) => `<${el}>` ).join( ' ' )} }
         VALUES ?sysProp  { ${PROP_MAP.sysComps.map( (el) => `<${el}>` ).join( ' ' )} }
 
         <${variable}> ?varProp ?system .
@@ -201,12 +207,11 @@ export default async function extract( content ) {
     /** @type {Set<Entity>} */
     const systems = new Set(); // collect all systems for post-processing
     for await ( const binding of sysStream ) {
-
       // build an entity for the component
       const component = binding.get( 'sysComp' );
       const entity = new Entity({
         iri:      component?.value,
-        shortIri: getPrefixed( prefixes, component?.value ),
+        shortIri: getPrefixed( component?.value ),
         isBlank:  component.termType == 'BlankNode',
       });
 
@@ -280,7 +285,7 @@ export default async function extract( content ) {
       if( !(entity in entities) ) {
         entities[ entity ] = new Constraint({
           iri:      entity,
-          shortIri: getPrefixed( prefixes, entity ),
+          shortIri: getPrefixed( entity ),
           isBlank:  binding.get( 'constraint' ).termType == 'BlankNode'
         });
         entry.addConstraint( entities[ entity ] );
@@ -325,12 +330,11 @@ export default async function extract( content ) {
 
 /**
  * shorten a given IRI by trying to apply prefixes
- * @param   {object} namespaces   map of prefixes and their expanded versions
  * @param   {string} iri          the IRI to shorten
  * @returns {string|null}         shortened IRI or null if no prefix was found
  */
-function getPrefixed( namespaces, iri ) {
-  for( const [key, value] of Object.entries( namespaces ) ) {
+export function getPrefixed( iri ) {
+  for( const [key, value] of Object.entries( NS ) ) {
     if( iri.startsWith( value ) ) {
       return iri.replace( value, `${key}:` );
     }

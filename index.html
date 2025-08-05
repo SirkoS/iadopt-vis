@@ -28,37 +28,52 @@
       <div class="tab-pane fade show active" id="rdf-tab-pane" role="tabpanel" aria-labelledby="rdf-tab" tabindex="0">
 
         <textarea id="input" class="font-monospace">
-          @prefix ex: <http://example.org/iadopt/challenge/> .
-          @prefix iop: <https://w3id.org/iadopt/ont/> .
-          @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/iadopt/challenge/> .
+@prefix iop: <https://w3id.org/iadopt/ont/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-          ex:C6 a iop:Variable ;
-              rdfs:label "Mass flux of carbon into soil from vegetation due to senescence" ;
-              ex:issue "https://github.com/i-adopt/examples/issues/23" ;
-              iop:hasConstraint [ a iop:Constraint ;
-                      rdfs:label "due to senescence" ;
-                      iop:constrains ex:C6_Matrix_SysA7 ] ;
-              iop:hasMatrix ex:C6_Matrix7 ;
-              iop:hasObjectOfInterest ex:C6_OoI7 ;
-              iop:hasProperty ex:C6_Prop7 .
+ex:someVar a iop:Variable ;
+    rdfs:label "some example variable" ;
+    rdfs:comment "used to illustrate the capabilities of the I-Adopt Visualizer" ;
+    iop:hasConstraint [
+      a iop:Constraint ;
+      rdfs:label "some constraint" ;
+      iop:constrains ex:Matrix_SysA
+    ], [
+      a iop:Constraint ;
+      rdfs:label "other constraint" ;
+      iop:constrains ex:Matrix_SysB
+    ] ;
+    iop:hasMatrix ex:Matrix ;
+    iop:hasObjectOfInterest ex:OoI ;
+    iop:hasStatisticalModifier ex:StatMod ;
+    iop:hasProperty ex:Prop .
 
-          ex:C6_Matrix7 a iop:Entity,
-                  iop:System ;
-              rdfs:label "vegetation-soil system" ;
-              iop:hasSource ex:C6_Matrix_SysA7 ;
-              iop:hasTarget ex:C6_Matrix_SysB7 .
+ex:Matrix
+    a iop:Entity, iop:System ;
+    rdfs:label "vegetation-soil system" ;
+    iop:hasSource ex:Matrix_SysA;
+    iop:hasTarget ex:Matrix_SysB.
 
-          ex:C6_OoI7 a iop:Entity ;
-              rdfs:label "carbon" .
+ex:OoI
+    a iop:Entity ;
+    rdfs:label "Object of Interest" .
 
-          ex:C6_Prop7 a iop:Property ;
-              rdfs:label "mass flux" .
+ex:StatMod
+    a iop:StatisticalModifier ;
+    rdfs:label "Statistical Modifier" .
 
-          ex:C6_Matrix_SysA7 a iop:Entity ;
-              rdfs:label "vegetation" .
+ex:Prop
+    a iop:Property ;
+    rdfs:label "Property" .
 
-          ex:C6_Matrix_SysB7 a iop:Entity ;
-              rdfs:label "soil" .
+ex:Matrix_SysA
+    a iop:Entity ;
+    rdfs:label "System Component A" .
+
+ex:Matrix_SysB
+    a iop:Entity ;
+    rdfs:label "System Component B" .
           </textarea>
 
       </div>
@@ -80,6 +95,7 @@
       <ul class="dropdown-menu">
         <li><a class="dropdown-item" href="#" data-format="svg">SVG</a></li>
         <!-- <li><a class="dropdown-item" href="#" data-format="png">PNG</a></li> -->
+        <!-- <li><a class="dropdown-item" href="#" data-format="ttl">Turtle</a></li> -->
       </ul>
     </div>
     <div>
@@ -87,6 +103,70 @@
     <div id="helper">
       <svg><text></text></svg>
     </div>
+  </div>
+
+  <div class="editor hidden">
+    <form>
+      <select class="form-select" aria-label="Component type" id="editor-type">
+        <option value="ContextObject">Context Object</option>
+        <option value="Constraint">Constraint</option>
+        <option value="Matrix">Matrix</option>
+        <option value="OoI">Object of Interest</option>
+        <option value="Property">Property</option>
+        <option value="StatisticalModifier">Statistical Modifier</option>
+        <option value="SystemComponent">System Component</option>
+        <option value="Variable">Variable</option>
+      </select>
+
+      <section class="mb-3">
+        <label class="form-label" for="editor-label">Label</label>
+        <input type="text" class="form-control" id="editor-label" />
+      </section>
+
+      <section class="mb-3">
+        <label class="form-label" for="editor-iri">IRI</label>
+        <input type="text" class="form-control" id="editor-iri" />
+      </section>
+
+      <section class="mb-3">
+        <label class="form-label" for="editor-desc">Description</label>
+        <textarea class="form-control" id="editor-desc"></textarea>
+      </section>
+
+      <section class="mb-3 editor-ent-type-section">
+        <label class="form-label">Type</label>
+        <div class="form-control">
+          <div class="even-space">
+            <div class="form-check">
+              <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="editor-ent-type" value="simple" checked />
+                simple
+              </label>
+            </div>
+            <div class="form-check">
+              <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="editor-ent-type" value="asym" />
+                asymmetric system
+              </label>
+            </div>
+            <div class="form-check">
+              <label class="form-check-label">
+                <input class="form-check-input" type="radio" name="editor-ent-type" value="sym" />
+                symmetric system
+              </label>
+            </div>
+          </div>
+
+          <select class="form-select hidden" aria-label="Properties for asymmetric system" id="editor-ent-type-props">
+          </select>
+        </div>
+      </section>
+
+      <div>
+        <button type="button" id="editor-save" class="btn btn-primary">Save</button>
+        <button type="button" id="editor-cancel" class="btn btn-secondary">Cancel</button>
+      </div>
+    </form>
   </div>
 
   <script type="module" src="/src/main.js"></script>

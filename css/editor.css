@@ -1,0 +1,104 @@
+/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXX SVG additions XXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+.menu {
+  display: none;
+}
+
+g:hover .menu {
+  display: block;
+}
+
+.menu rect.overlay {
+  opacity: 0.8;
+}
+
+.menu foreignObject > div {
+
+  height: 100%;
+
+  align-items: center;
+  justify-content: center;
+
+}
+
+.menu foreignObject button {
+  margin: 0;
+}
+
+/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXX Editor Overlay XXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+
+.editor {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  background-color: rgba( 30, 30, 30, 0.9 );
+
+  align-items: center;
+  justify-content: center;
+}
+
+.editor label {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.editor form {
+  background-color: var(--bs-body-bg);
+  padding: 1em;
+  border: 1px solid var(--bs-body-color);
+  border-radius: 1em;
+}
+
+#editor-type {
+  text-align: center;
+  font-weight: bold;
+  font-size: 110%;
+  margin-bottom: 2em;
+}
+#editor-type:focus {
+  box-shadow: none;
+}
+#editor-type:disabled {
+  background-image: none;
+}
+.editor.constraint #editor-type { background-color: var(--color-constraint-main); color: #000; border-color: var(--color-constraint-dark); }
+.editor.comp       #editor-type { background-color: var(--color-entity-main);     color: #000; border-color: var(--color-entity-dark); }
+.editor.entity     #editor-type { background-color: var(--color-entity-main);     color: #000; border-color: var(--color-entity-dark); }
+.editor.property   #editor-type { background-color: var(--color-property-main);   color: #000; border-color: var(--color-property-dark); }
+.editor.statmod    #editor-type { background-color: var(--color-statmod-main);    color: #000; border-color: var(--color-statmod-dark); }
+.editor.variable   #editor-type { background-color: var(--color-variable-main);   color: #fff; border-color: var(--color-variable-dark); }
+
+#editor-ent-type-props {
+  width: auto;
+  margin: 1em auto 0;
+  text-align: center;
+}
+
+.editor textarea {
+  width: 40em;
+  height: 10em;
+}
+
+.editor .even-space {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.editor button {
+  width: 10em;
+}
+
+.editor-ent-type-section {
+  display: none;
+}
+.editor.entity .editor-ent-type-section {
+  display: block;
+}

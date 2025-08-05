@@ -4,10 +4,9 @@ import '../css/svg.css';
 import '../css/error.css';
 import SvgCss  from '../css/svg.css?raw';
 
-
-import draw from './lib/draw.js';
+import addEditor from './lib/addEditor.js';
+import triggerRedraw from './lib/triggerRedraw.js';
 import extract from './lib/extract.js';
-import createLayout from './lib/createLayout.js';
 
 import { showError } from './ui/showError.js';
 
@@ -21,35 +20,27 @@ document.querySelector( '#visualize' )
 
     try {
 
-
       // extract components to visualize
       let content;
       try {
         content = await extract( raw );
       } catch( e ) {
+        console.error( e );
         showError( '#svg', e, 'Parsing', raw );
         return;
       }
 
-      // create the layout
-      const layout = await createLayout( content[0] );
+      // trigger a redraw
+      triggerRedraw( content[0] );
 
-      // get SVG container
-      const svg = document.querySelector( '#svg' );
-
-      // draw it
-      await draw( svg, layout );
-
-      // remember variable IRI
-      svg.dataset.iri = content[0].getIri();
+      // add editor
+      await addEditor();
 
       // enable export button
       document.querySelector( '#export' ).classList.remove( 'invisible' );
 
-      // scroll into view
-      svg.scrollIntoView( true );
-
     } catch( e ) {
+      console.error( e );
       showError( '#svg', e, 'Rendering', raw );
     }
 

@@ -1,12 +1,14 @@
 import Cfg from '../config';
+import { Concept } from '../model/models';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 
 /**
  * render a given layout into a div
- * @param {HTMLElement} div     DOM div element to render the SVG in
- * @param {object}      layout  the layout to render
+ * @param   {HTMLElement} div     DOM div element to render the SVG in
+ * @param   {object}      layout  the layout to render
+ * @returns {Map<HTMLElement, Concept}    map connecting SVG boxes with their corresponding Variable Component
  */
 export default function draw( div, layout ) {
 
@@ -92,6 +94,9 @@ export default function draw( div, layout ) {
 
   }
 
+  // prepare result mapping
+  const result = new Map();
+
   // draw all entities
   for( const box of layout.boxes ) {
 
@@ -99,6 +104,9 @@ export default function draw( div, layout ) {
     const container = createElement( 'g', {
       class: box.className,
     } );
+
+    // memorize
+    result.set( container, box );
 
     // --- boxes ---
 
@@ -183,6 +191,8 @@ export default function draw( div, layout ) {
   div.innerHTML = '';
   div.appendChild( svg );
 
+  return result;
+
 }
 
 /**
@@ -190,7 +200,7 @@ export default function draw( div, layout ) {
  * @param {string} name   tagName of the element to create
  * @param {object} attr   key-value list of the attributes to add
  */
-function createElement( name, attr = {} ) {
+export function createElement( name, attr = {} ) {
 
   const el = document.createElementNS( SVG_NS, name );
   for( const [key, value] of Object.entries( attr ) ) {

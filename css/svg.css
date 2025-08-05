@@ -32,39 +32,61 @@ rect.title {
   opacity: 0.2;
 }
 
+:root {
+  --color-variable-main:  #2D7600;
+  --color-variable-light: #60A917;
+  --color-variable-dark:  #2D7600;
+
+  --color-property-main:  #B266FF;
+  --color-property-light: #E1D5E7;
+  --color-property-dark:  #B266FF;
+
+  --color-entity-main:  #6C8EBF;
+  --color-entity-light: #DAE8FC;
+  --color-entity-dark:  #6C8EBF;
+
+  --color-statmod-main:  #666666;
+  --color-statmod-light: #DDDDDD;
+  --color-statmod-dark:  #666666;
+
+  --color-constraint-main:  #B85450;
+  --color-constraint-light: #F8CECC;
+  --color-constraint-dark:  #B85450;
+}
+
 /* ----------------- Variable ---------------- */
 
 .variable text.type { fill: #fff; }
-.variable rect        { fill:   #60A917; }
-.variable rect.title  { fill:   #2D7600; }
-.variable .frame      { stroke: #2D7600; }
+.variable rect        { fill:   var(--color-variable-light); }
+.variable rect.title  { fill:   var(--color-variable-main); }
+.variable .frame      { stroke: var(--color-variable-dark); }
 
 /* ----------------- Property ---------------- */
 
-.property rect        { fill:   #E1D5E7; }
-.property rect.title  { fill:   #B266FF; }
-.property .frame      { stroke: #B266FF; }
+.property rect        { fill:   var(--color-property-light); }
+.property rect.title  { fill:   var(--color-property-main); }
+.property .frame      { stroke: var(--color-property-dark); }
 
 /* ------------ Entity / System -------------- */
 
 .entity rect,
-.system rect         { fill:   #DAE8FC; }
+.system rect         { fill:   var(--color-entity-light); }
 .entity rect.title
-.system rect.title   { fill:   #6C8EBF; }
+.system rect.title   { fill:   var(--color-entity-main); }
 .entity .frame,
-.system .frame       { stroke: #6C8EBF; }
+.system .frame       { stroke: var(--color-entity-dark); }
 
 /* ---------- Statistical Modifier ----------- */
 
-.statmod rect        { fill:   #DDDDDD; }
-.statmod rect.title  { fill:   #666666; }
-.statmod .frame      { stroke: #666666; }
+.statmod rect        { fill:   var(--color-statmod-light); }
+.statmod rect.title  { fill:   var(--color-statmod-main); }
+.statmod .frame      { stroke: var(--color-statmod-dark) }
 
 /* ---------------- Constraint --------------- */
 
-.constraint rect        { fill:   #F8CECC; }
-.constraint rect.title  { fill:   #B85450; }
-.constraint .frame      { stroke: #B85450; }
+.constraint rect        { fill:   var(--color-constraint-light) }
+.constraint rect.title  { fill:   var(--color-constraint-main); }
+.constraint .frame      { stroke: var(--color-constraint-dark); }
 
 /* ------------------ Arrows ----------------- */
 

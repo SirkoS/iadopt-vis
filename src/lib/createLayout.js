@@ -313,6 +313,7 @@ function getBox( type, data, initialY ) {
 
   // base entry for the box
   const box = {
+    comp:           data,
     x:              data.x ?? Cfg.layout.margin,
     width:          boxWidth,
     y:              initialY,
@@ -476,11 +477,10 @@ function layoutConstraints(parent, result) {
     result.arrows.push( arrow );
 
     // adjust parent start, if more constraints are coming
-    parent.startY = box.y + box.height + Cfg.layout.entity.vertMarginTiny;
-    startY = parent.startY;
+    startY = box.y + box.height + Cfg.layout.entity.vertMarginTiny;
 
   }
 
-  return parent.startY ?? startY;
+  return startY;
 
 }
