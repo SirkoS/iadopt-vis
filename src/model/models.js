@@ -439,6 +439,14 @@ export class Variable extends Concept {
 
 
   /**
+   * @param {Entity} ctx
+   */
+  _removeStatisticalModifier( ctx ) {
+    this.#statisticalModifier = undefined;
+  }
+
+
+  /**
    *
    */
   _removeMatrix() {
@@ -759,6 +767,9 @@ export class Entity extends Concept {
         break;
       case 'ContextObject':
         this.getVariable()._removeContextObject( this );
+        break;
+      case 'StatisticalModifier':
+        this.getVariable()._removeStatisticalModifier( this );
         break;
       default:
         throw Error( `Missing Code for removal of Entity type ${this.getRole()}` );
