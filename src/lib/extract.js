@@ -223,12 +223,12 @@ export default async function extract( content ) {
       const siblings = Object
         .values( parent.getComponents() )
         .flatMap( (el) => el );
-      if( siblings.some( (sib) => sib.getIri() == entity.getIri() ) ) {
+      if( siblings.some( (sib) => sib.getId() == entity.getId() ) ) {
         continue;
       }
 
-      // other wise, register
-      entities[ entity.getIri() ] = entity;
+      // otherwise, register
+      entities[ entity.getId() ] = entity;
 
       // add labels & descriptions
       let value = binding.get( 'label' );

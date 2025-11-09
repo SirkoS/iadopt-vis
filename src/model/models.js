@@ -134,6 +134,17 @@ export class Concept {
 
 
   /**
+   * return an identifier for this concept
+   * for named nodes, this is the IRI
+   * for blank nodes, this will be an arbitrary identifier
+   * @returns {string}
+   */
+  getId(){
+    return this._iri;
+  }
+
+
+  /**
    *
    * @returns {string}
    */

@@ -15,6 +15,7 @@ describe( 'extract', function() {
 
     fixtures.example1 = await Fs.readFile( './test/_fixture/example1.ttl', 'utf8' );
     fixtures.example2 = await Fs.readFile( './test/_fixture/example2.ttl', 'utf8' );
+    fixtures.example3_asymSys_bnode = await Fs.readFile( './test/_fixture/example3_asymSys_bnode.ttl', 'utf8' );
 
   });
 
@@ -79,5 +80,32 @@ describe( 'extract', function() {
                   'should contain the correct label for the Constraint' );
 
   } );
+
+
+
+  it.only( 'should extract all components of an entry with symmetric systems using blank nodes as components', async function(){
+
+    // get entities
+    const result = await extract( fixtures.example3_asymSys_bnode );
+
+    // structural validation
+    const variable = result[0];
+    assert.instanceOf( variable,                        Variable, 'should be instance of Variable' );
+    assert.instanceOf( variable.getProperty(),          Property, 'should return a Property' );
+    assert.instanceOf( variable.getObjectOfInterest(),  Entity,   'should return an ObjectOfInterest' );
+    const ooi = variable.getObjectOfInterest();
+    assert.isOk( ooi.isSystem() && ooi.isSymmetricSystem(), 'should have the ObjectOfInterest as SymmetricSystem' );
+    const comps = ooi.getComponents();
+    assert.sameMembers( Object.keys( comps ), [ 'hasPart' ], 'should have only `hasPart` for components of OoI' );
+    assert.equal( comps['hasPart'].length, 2, 'should have two components for the OoI' );
+    assert.isOk( comps['hasPart'][0] !== comps['hasPart'][1], 'should have two disjoint components' );
+
+    // labels
+    assert.sameMembers( comps['hasPart'].map( (c) => c.getLabel() ),
+                  ['position of grid cell', 'position of the radial antenna' ],
+                  'should have proper labels for both components' );
+
+  } );
+
 
 });
