@@ -407,6 +407,12 @@ function layoutText({ text, startY, boxWidth, boxCenter }) {
  */
 function layoutConstraints(parent, result) {
 
+  // shortcut
+  const constraints = parent.getConstraints();
+  if( constraints.length < 1 ) {
+    return;
+  }
+
   // set starting vertical value
   let startY = parent.startY
                   ?? parent.box.y + parent.box.height
@@ -425,7 +431,9 @@ function layoutConstraints(parent, result) {
     }
   }
 
-  for( const constraint of parent.getConstraints() ) {
+
+  let first = true; // highlight first constraint in case we have multiple ones
+  for( const constraint of constraints ) {
 
     // copy part of the dimensions from parent box (aka the entity being constrained)
     // TODO layout in case multiple entities are constrained by a single constraint
@@ -438,7 +446,7 @@ function layoutConstraints(parent, result) {
 
     // add the corresponding arrow
     let arrow;
-    if( !parent.startY ) {
+    if( first ) {
 
       // full arrow only for the first constraint
       arrow = {
@@ -456,6 +464,12 @@ function layoutConstraints(parent, result) {
         type: 'constrains',
       };
 
+      // adjust parent start, if more constraints are coming
+      startY = box.y + box.height + Cfg.layout.entity.vertMarginTiny;
+
+      // there can only be one first element
+      first = !first;
+
     } else {
 
       // later ones get only a path fragment
@@ -464,7 +478,7 @@ function layoutConstraints(parent, result) {
           { x: box.x + 0.5 * box.width, y: box.y },
           {
             x: parent.box.x + 0.5 * parent.box.width,
-            y: parent.startY - Cfg.layout.entity.vertMarginTiny, // account for the distance to next-higher box
+            y: startY - Cfg.layout.entity.vertMarginTiny, // account for the distance to next-higher box
           },
         ],
         x:    box.x + 0.5 * box.width,
