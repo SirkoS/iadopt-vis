@@ -1,0 +1,74 @@
+@prefix iop: <https://w3id.org/iadopt/ont/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/iadopt/challenge/> .
+
+ex:issue002
+    a
+        iop:Variable ;
+    rdfs:label
+        "Issue 002" ;
+    rdfs:comment
+        "hasConstraint arrow pointing to wrong constraints (top and not bottom)" ;
+    iop:hasObjectOfInterest
+        ex:OoI ;
+    iop:hasMatrix
+        ex:Matrix ;
+    iop:hasProperty
+        ex:Prop ;
+    iop:hasConstraint
+        [ a iop:Constraint ;
+             rdfs:label "Constraint A-I" ;
+             iop:constrains ex:PartA ;
+        ] ,
+        [ a iop:Constraint ;
+             rdfs:label "Constraint A-II" ;
+             iop:constrains ex:PartA ;
+        ] ,
+        [ a iop:Constraint ;
+             rdfs:label "Constraint B-I" ;
+             iop:constrains ex:PartB ;
+        ] ,
+        [ a iop:Constraint ;
+             rdfs:label "Constraint B-II" ;
+             iop:constrains ex:PartB ;
+        ] ,
+        [ a iop:Constraint ;
+             rdfs:label "Constraint Matrix" ;
+             iop:constrains ex:Matrix ;
+        ] .
+
+ex:OoI
+    a
+        iop:Entity ;
+    rdfs:label
+        "OoI" .
+
+ex:Matrix
+    a
+        iop:Entity ,
+        iop:AsymmetricSystem ;
+    rdfs:label
+        "Matrix System" ;
+    iop:hasSource
+        ex:PartA ;
+    iop:hasTarget
+        ex:PartB .
+
+ex:Prop
+    a
+        iop:Property ;
+    rdfs:label
+        "Prop" .
+
+ex:PartA
+    a
+        iop:Entity ;
+    rdfs:label
+        "PartA" .
+
+ex:PartB
+    a
+        iop:Entity ;
+    rdfs:label
+        "PartB" .

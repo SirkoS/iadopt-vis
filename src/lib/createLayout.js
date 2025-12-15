@@ -187,13 +187,15 @@ export default function createLayout( data ) {
     // get overall left-most constraint
     const leftConstraint = constraints.reduce( (left, cur) => (left.box.x < cur.box.x ? left : cur), constraints[0] );
     // get overall bottom-most constraint
-    const botConstraint = constraints.reduce( (bot, cur) => (bot.box.y < cur.box.y ? bot : cur), constraints[0] );
+    const botConstraint = constraints.reduce( (bot, cur) => (bot.box.y > cur.box.y ? bot : cur), constraints[0] );
 
     // add arrow start as a frame (includes label)
     const x = system.box.x + system.box.width + 0.5 * Cfg.layout.entity.horMargin;
     const maxY = botConstraint.box.y + botConstraint.box.height + Cfg.layout.entity.vertMarginTiny;
+    const sysHasConstraints = system.getConstraints().length > 0;
+    console.log( sysHasConstraints )
     arrow = {
-      text: ARROW_LABELS.hasConstraint,
+      text: sysHasConstraints ? undefined : ARROW_LABELS.hasConstraint,
       path: [
         {
           x: x,
@@ -227,9 +229,10 @@ export default function createLayout( data ) {
       }
 
       // get bottom-most constraint
-      const botConstraint = constraints.reduce( (bot, cur) => (bot.box.y < cur.box.y ? bot : cur), constraints[0] );
+      const botConstraint = constraints.reduce( (bot, cur) => (bot.box.y > cur.box.y ? bot : cur), constraints[0] );
 
       // add the missing arrow bit
+      const maxY = botConstraint.box.y + botConstraint.box.height + Cfg.layout.entity.vertMarginTiny;
       arrow = {
         path: [
           {
@@ -420,15 +423,24 @@ function layoutConstraints(parent, result) {
 
   // in case of system, process all components first
   if( parent.isSystem() ) {
+
+    // process components
     const sysComponents = parent.getComponents();
+    let newStartY = startY; // startY modified by constraints of components
     for( const key of Object.keys( sysComponents ) ) {
       for( const sysComp of sysComponents[ key ] ) {
-        startY = Math.max(
+        newStartY = Math.max(
           layoutConstraints( sysComp, result ),
-          startY
+          newStartY
         );
       }
     }
+
+    // if any component had constraints, leave some more space
+    if( startY != newStartY ) {
+      startY = newStartY += Cfg.layout.entity.vertMarginTiny;
+    }
+
   }
 
 

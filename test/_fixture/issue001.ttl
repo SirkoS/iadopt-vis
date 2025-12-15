@@ -1,13 +1,14 @@
 @prefix iop: <https://w3id.org/iadopt/ont/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix ex: <http://example.org/iadopt/HFR> .
 
-ex:issueVar
+ex:issue001
     a
         iop:Variable ;
     rdfs:label
+        "Issue 001" ;
+    rdfs:comment
         "arrows for multiple constraints are overlapping" ;
     iop:hasObjectOfInterest
         ex:OoI ;
