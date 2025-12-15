@@ -230,7 +230,11 @@ function triggerAction(e) {
 
     // (recursively) trigger removal of component
     comp.remove();
+
+    // update UI
     triggerRedraw( STATE.variable );
+    ELEMENTS.input.value = toTurtle( STATE.variable );
+
     return;
 
   }
