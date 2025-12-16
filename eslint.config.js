@@ -1,19 +1,19 @@
-import mocha from 'eslint-plugin-mocha';
-import globals from 'globals';
+import { defineConfig } from "eslint/config";
+import jsdoc from "eslint-plugin-jsdoc";
 
-export default [
-  mocha.configs.flat.recommended,
-
+export default defineConfig([
   {
-    'languageOptions': {
+    files: ["**/*.js"],
+    plugins: {
+      jsdoc: jsdoc,
+    },
+    languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
-      globals: {
-        ...globals.browser,
-      },
     },
-    'ignores': [ '**/*.html' ],
-    'rules': {
+
+    rules: {
+
       'indent': [
         'warn',
         2,
@@ -42,5 +42,7 @@ export default [
       'no-trailing-spaces': [
         'warn'
       ]
-    }
-  }];
+
+    },
+  },
+]);

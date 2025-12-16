@@ -1,27 +1,24 @@
+import { assert, beforeAll, describe, test } from 'vitest';
+import { promises as Fs } from 'node:fs';
+
 import extract from '../src/lib/extract.js';
 import { Constraint, Entity, Property, Variable } from '../src/model/models.js';
-import { assert } from 'chai';
-import { promises as Fs } from 'fs';
 
-describe( 'extract', function() {
+// load fixtures
+const fixtures = {};
+beforeAll( async function(){
 
-  // increase test timeouts
-  this.timeout( 5000 );
+  fixtures.example1 = await Fs.readFile( './test/_fixture/example1.ttl', 'utf8' );
+  fixtures.example2 = await Fs.readFile( './test/_fixture/example2.ttl', 'utf8' );
+  fixtures.example3_asymSys_bnode = await Fs.readFile( './test/_fixture/example3_asymSys_bnode.ttl', 'utf8' );
 
-  // load fixtures
-  const fixtures = {};
-
-  before( async function(){
-
-    fixtures.example1 = await Fs.readFile( './test/_fixture/example1.ttl', 'utf8' );
-    fixtures.example2 = await Fs.readFile( './test/_fixture/example2.ttl', 'utf8' );
-    fixtures.example3_asymSys_bnode = await Fs.readFile( './test/_fixture/example3_asymSys_bnode.ttl', 'utf8' );
-
-  });
+});
 
 
 
-  it( 'should extract all components of a minimal entry', async function(){
+describe( 'extract', () => {
+
+  test( 'extracts all components of a minimal entry', async function(){
 
     // get entities
     const result = await extract( fixtures.example1 );
@@ -46,7 +43,7 @@ describe( 'extract', function() {
 
 
 
-  it( 'should extract all components of an entry with blank node constraints', async function(){
+  test( 'extracts all components of an entry with blank node constraints', async function(){
 
     // get entities
     const result = await extract( fixtures.example2 );
@@ -83,7 +80,7 @@ describe( 'extract', function() {
 
 
 
-  it.only( 'should extract all components of an entry with symmetric systems using blank nodes as components', async function(){
+  test( 'extracts all components of an entry with symmetric systems using blank nodes as components', async function(){
 
     // get entities
     const result = await extract( fixtures.example3_asymSys_bnode );
@@ -102,10 +99,11 @@ describe( 'extract', function() {
 
     // labels
     assert.sameMembers( comps['hasPart'].map( (c) => c.getLabel() ),
-                  ['position of grid cell', 'position of the radial antenna' ],
-                  'should have proper labels for both components' );
+                        ['position of grid cell', 'position of the radial antenna' ],
+                        'should have proper labels for both components' );
 
   } );
 
-
 });
+
+
