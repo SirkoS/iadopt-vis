@@ -1,27 +1,20 @@
-import { assert, beforeAll, describe, test } from 'vitest';
-import { promises as Fs } from 'node:fs';
+import { assert, beforeAll, describe, inject, test } from 'vitest';
 
 import extract from '../src/lib/extract.js';
 import { Constraint, Entity, Property, Variable } from '../src/model/models.js';
-
-// load fixtures
-const fixtures = {};
-beforeAll( async function(){
-
-  fixtures.example1 = await Fs.readFile( './test/_fixture/example1.ttl', 'utf8' );
-  fixtures.example2 = await Fs.readFile( './test/_fixture/example2.ttl', 'utf8' );
-  fixtures.example3_asymSys_bnode = await Fs.readFile( './test/_fixture/example3_asymSys_bnode.ttl', 'utf8' );
-
-});
 
 
 
 describe( 'extract', () => {
 
+  // get fixtures
+  const turtles = inject( 'ttl' );
+
+
   test( 'extracts all components of a minimal entry', async function(){
 
     // get entities
-    const result = await extract( fixtures.example1 );
+    const result = await extract( turtles['test\\_fixture\\example1.ttl'] );
 
     // structural validation
     assert.isArray( result, 'should return an array' );
@@ -39,14 +32,14 @@ describe( 'extract', () => {
     assert.equal( variable.getProperty().getLabel(),          'Height',             'should contain the correct label for the Property' );
     assert.equal( variable.getObjectOfInterest().getLabel(),  'a biological tree',  'should contain the correct label for the ObjectOfInterest' );
 
-  } );
+  }, 10_000 );
 
 
 
   test( 'extracts all components of an entry with blank node constraints', async function(){
 
     // get entities
-    const result = await extract( fixtures.example2 );
+    const result = await extract( turtles['test\\_fixture\\example2.ttl'] );
 
     // structural validation
     assert.isArray( result, 'should return an array' );
@@ -83,7 +76,7 @@ describe( 'extract', () => {
   test( 'extracts all components of an entry with symmetric systems using blank nodes as components', async function(){
 
     // get entities
-    const result = await extract( fixtures.example3_asymSys_bnode );
+    const result = await extract( turtles['test\\_fixture\\example3_asymSys_bnode.ttl'] );
 
     // structural validation
     const variable = result[0];

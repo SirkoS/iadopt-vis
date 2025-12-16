@@ -14,6 +14,7 @@ export default defineConfig({
 
       {
         test:{
+          extends: true,
           name: 'browser',
           include: [
             'test/**/*.browser.{test,spec}.js',
@@ -27,15 +28,13 @@ export default defineConfig({
             ],
             headless: true,
             screenshotFailures: false,
-          },
-          provide:{
-            ttl: ttlFiles,
           }
         }
       },
 
       {
         test:{
+          extends: true,
           name: 'node',
           include: [
             'test/**/*.unit.{test,spec}.js',
@@ -45,6 +44,9 @@ export default defineConfig({
         }
       },
 
-    ]
+    ],
+    provide:{
+      ttl: ttlFiles,
+    }
   },
 });
