@@ -1,4 +1,19 @@
-const helperText = document.querySelector( '#helper text' );
+const helperText = document.querySelector( '#helper text' ) || (() => { // helper function if no element is present on the screen
+
+  // create wrapping SVG
+  const svg = document.createElement( 'svg' );
+  svg.style.visibility = 'hidden';
+  svg.style.position = 'fixed';
+  svg.style.top = '-100';
+  svg.style.left = '-100';
+
+  // create text element
+  const text = document.createElement( 'text' );
+  svg.appendChild( text );
+  document.body.appendChild( svg );
+
+  return text;
+})();
 
 const minTextWidth = Math.max(
   getTextDims( 'Property' ).width,

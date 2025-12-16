@@ -2,7 +2,7 @@ import Cfg from '../config.js';
 import calcBoxWidth from './createLayout/equalWidth.js';
 import getTextDims from './createLayout/getTextDims.js';
 import splitText from './createLayout/splitText.js';
-import { Constraint, Entity, Property, Variable } from '../model/models.js';
+import { Concept, Constraint, Entity, Property, Variable } from '../model/models.js';
 
 // labels for arrows connecting Variable and the direct properties
 const ARROW_LABELS = {
@@ -15,10 +15,41 @@ const ARROW_LABELS = {
   'hasConstraint':        'hasConstraint',
 };
 
+
+/**
+ * @typedef Layout
+ * @property {Array.<Arrow>}  arrows
+ * @property {Array.<Box>}    boxes
+ */
+
+/**
+ * @typedef Text
+ *
+ * @property {string}         className  CSS classes to be attached
+ * @property {string}         [link]     URL to be linked to
+ * @property {string}         text       text content
+ * @property {number}         x          horizontal center
+ * @property {number}         y          vertical center
+ */
+
+/**
+ * @typedef Box one box to be rendered, representing some component of the Variable
+ *
+ * @property {string}         className       CSS classes to be attached
+ * @property {Concept}        comp            corresponding component
+ * @property {number}         descSeparator   y-coordinate of separator between title and description
+ * @property {number}         x               left coordinate of box
+ * @property {number}         y               upper coordinate of box
+ * @property {number}         width           width of box
+ * @property {number}         height          height of box
+ * @property {Array.<Text>}   texts           text elements of the box
+ */
+
+
 /**
  * do the layout for a single Variable
  * @param   {Variable} data   Variable description
- * @returns {object}          computed layout
+ * @returns {Layout}          computed layout
  */
 export default function createLayout( data ) {
 
@@ -193,7 +224,6 @@ export default function createLayout( data ) {
     const x = system.box.x + system.box.width + 0.5 * Cfg.layout.entity.horMargin;
     const maxY = botConstraint.box.y + botConstraint.box.height + Cfg.layout.entity.vertMarginTiny;
     const sysHasConstraints = system.getConstraints().length > 0;
-    console.log( sysHasConstraints )
     arrow = {
       text: sysHasConstraints ? undefined : ARROW_LABELS.hasConstraint,
       path: [
@@ -365,7 +395,7 @@ function getBox( type, data, initialY ) {
  * @param   {number}  p.boxCenter
  * @returns {Array<TextLineLayout>}
  */
-function layoutText({ text, startY, boxWidth, boxCenter }) {
+export function layoutText({ text, startY, boxWidth, boxCenter }) {
 
   /** @type {Array<TextLineLayout>} */
   const lines = [];
@@ -373,11 +403,18 @@ function layoutText({ text, startY, boxWidth, boxCenter }) {
   // split description until it fits the box width
   let commentWidth = getTextDims( text );
   let comment = [ text ];
+  let newComment = [];
   const maxWidth = boxWidth - 2 * Cfg.layout.entity.textMargin;
   while( commentWidth.width > maxWidth ) {
 
     // next split
-    comment = splitText( text, comment.length + 1 );
+    newComment = splitText( text, comment.length + 1 );
+
+    // proceed if nothing changed anymore
+    if( newComment.length == comment.length ) {
+      break;
+    }
+    comment = newComment;
 
     // max line length
     commentWidth = comment.reduce( (max, el) => {
@@ -412,7 +449,7 @@ function layoutConstraints(parent, result) {
 
   // shortcut
   const constraints = parent.getConstraints();
-  if( constraints.length < 1 ) {
+  if( !parent.isSystem() && (constraints.length < 1) ) {
     return;
   }
 
