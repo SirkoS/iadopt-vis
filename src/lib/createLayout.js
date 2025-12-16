@@ -2,7 +2,9 @@ import Cfg from '../config.js';
 import calcBoxWidth from './createLayout/equalWidth.js';
 import getTextDims from './createLayout/getTextDims.js';
 import splitText from './createLayout/splitText.js';
-import { Concept, Constraint, Entity, Property, Variable } from '../model/models.js';
+import {
+  Concept, Constraint, Entity, Property, Variable,
+} from '../model/models.js';
 
 // labels for arrows connecting Variable and the direct properties
 const ARROW_LABELS = {
@@ -125,8 +127,11 @@ export default function createLayout( data ) {
 
     // account for systems
     if( obj.isSystem() ) {
+
+      // create boxes
       const sysComponents = obj.getComponents();
-      for( const key of Object.keys( sysComponents ) ) {
+      const keys = Object.keys( sysComponents );
+      for( const key of keys ) {
 
         for( const sysComp of sysComponents[ key ] ) {
 

@@ -1,5 +1,6 @@
 import Cfg from '../../config.js';
 import { Entity } from '../../model/models.js';
+import { VALID_ASYMMETRIC_SYSTEM_PROPERTY_PAIRS } from '../../model/models.js';
 
 /**
  * horizontally layout for a given set of boxes
@@ -41,19 +42,33 @@ export default function calcBoxWidth( boxes ) {
                   + 0.5 * Cfg.layout.entity.horMargin       // horizontal margin to account for Constraints on Properties
                   + left;                                   // previous boxes in that row
 
-      // process all components
-      for( const comp of Object.values( box.getComponents() ).flatMap( (s) => s ) ) {
+      // determine order of system components
+      const keys = box.getComponentKeys();
+      let orderedKeys = keys;
+      if( !box.isSymmetricSystem() ) {
+        const keySet = new Set( keys );
+        orderedKeys = VALID_ASYMMETRIC_SYSTEM_PROPERTY_PAIRS.find( (pair) => (new Set( pair )).symmetricDifference( keySet ).size < 1 );
+        if( !orderedKeys ) {
+          throw new Error( 'Unknown AsymmetricSystem properties!' );
+        }
+      }
 
-        comp.width = width;
-        comp.x = Cfg.layout.margin                        // outer margin
+      // process all components
+      const sysComponents = box.getComponents();
+      for( const key of orderedKeys ) {
+        for( const comp of sysComponents[ key ] ) {
+
+          comp.width = width;
+          comp.x = Cfg.layout.margin                      // outer margin
                 + 0.5 * Cfg.layout.entity.horMargin       // horizontal margin to account for Constraints on Properties
                 + left;                                   // previous boxes in that row
 
-        // increase for next box
-        left += width + Cfg.layout.entity.horMargin;
+          // increase for next box
+          left += width + Cfg.layout.entity.horMargin;
 
-
+        }
       }
+
 
     } else {
 

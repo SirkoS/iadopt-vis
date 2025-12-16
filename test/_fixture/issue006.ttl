@@ -1,0 +1,43 @@
+@prefix iop: <https://w3id.org/iadopt/ont/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/> .
+
+ex:issue006
+    a
+        iop:Variable ;
+    rdfs:label
+        "Issue 006" ;
+    rdfs:comment
+        """correct order in rendering of AsymmetricSystem properties""" ;
+    iop:hasObjectOfInterest
+        _:b0 ;
+    iop:hasProperty
+        ex:Prop .
+
+_:b0
+    a
+        iop:Entity ,
+        iop:AsymmetricSystem ;
+    iop:hasNumerator
+        ex:Numerator ;
+    iop:hasDenominator
+        ex:Denominator .
+
+ex:Prop
+    a
+        iop:Property ;
+    rdfs:label
+        "Prop" .
+
+ex:Numerator
+    a
+        iop:Entity ;
+    rdfs:label
+        "Numerator" .
+
+ex:Denominator
+    a
+        iop:Entity ;
+    rdfs:label
+        "Denominator" .

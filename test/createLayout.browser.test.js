@@ -3,18 +3,24 @@ import { assert, describe, test, inject } from 'vitest';
 import { Entity } from '../src/model/models.js';
 import extract from '../src/lib/extract.js';
 import createLayout from '../src/lib/createLayout.js';
+import { VALID_ASYMMETRIC_SYSTEM_PROPERTY_PAIRS, VALID_ASYMMETRIC_SYSTEM_PROPERTIES } from '../src/model/models.js';
 
 describe( 'createLayout', async () => {
 
   // get fixtures
   const turtles = inject( 'ttl' );
 
+
   for await (const [ file, ttl ] of Object.entries( turtles ) ) {
-    test( `creates layout for ${file}`, async () => {
+    test( `property-based tests for ${file}`, async () => {
 
       // parse and layout
       const variables = await extract( ttl );
       const layout = await createLayout( variables[0] );
+
+      // preconditions
+      assert.isArray( variables, 'should return a list of Variables' );
+      assert.equal( variables.length, 1, 'should return exactly one Variable' );
 
       // make sure no boxes are overlapping
       for( const boxA of layout.boxes ) {
@@ -31,6 +37,29 @@ describe( 'createLayout', async () => {
 
         }
       }
+
+      // for all AsymmetricSystems, keep order of properties
+      const asymArrows = layout.arrows.filter( (a) => VALID_ASYMMETRIC_SYSTEM_PROPERTIES.includes( a.text ) );
+      if( asymArrows.length > 0 ) {
+
+        // sanity check
+        assert.ok( asymArrows.length % 2 == 0, 'should contain pairs of asymmetric properties' );
+
+        // sort by x-coordinate, so we have them in proper pairs
+        asymArrows.sort( (a,b) => a.x - b.x );
+        for( let i=0; i<asymArrows.length; i+=2 ) {
+
+          // find property pair
+          const propPair = VALID_ASYMMETRIC_SYSTEM_PROPERTY_PAIRS.find( (pair) => pair.includes( asymArrows[i].text ) );
+
+          // check proper order
+          assert.equal( propPair.findIndex( (el) => el == asymArrows[i].text ),   0, 'should have the correct property in first position' );
+          assert.equal( propPair.findIndex( (el) => el == asymArrows[i+1].text ), 1, 'should have the correct property in second position' );
+
+        }
+
+      }
+
 
     }, 5_000 );
   }
