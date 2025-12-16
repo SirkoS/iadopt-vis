@@ -36,7 +36,7 @@ describe( 'createLayout', async () => {
 
 
 
-  test( 'shows no title, if a system is a blank node and has no label', async () => {
+  test( 'shows no title if a system is a blank node and has no label', async () => {
 
     // parse and layout
     const variables = await extract( turtles['test\\_fixture\\issue004.ttl'] );
@@ -46,6 +46,30 @@ describe( 'createLayout', async () => {
     assert.isArray( layout.boxes, 'should contain a list of boxes' );
     const system = layout.boxes.find( (el) => (el.comp instanceof Entity) && (el.comp.isSystem()) );
     assert.deepEqual( system.texts.map( (el) => el.text ), [ 'AsymmetricSystem' ], 'should only contain the header but not title' );
+
+  });
+
+
+
+  test( 'shows proper arrows for different number of constraints in system components', async () => {
+
+    // parse and layout
+    const variables = await extract( turtles['test\\_fixture\\issue005.ttl'] );
+    const layout = await createLayout( variables[0] );
+
+    // assert
+    assert.isArray( layout.arrows, 'should contain a list of arrows' );
+    const hasConstraintArrows = layout.arrows.filter( (a) => a.type == 'hasConstraint' );
+    const headedArrows = hasConstraintArrows.filter( (a) => !a.hideHead );
+    const textArrow = hasConstraintArrows.filter( (a) => a.text );
+    assert.equal( headedArrows.length, 2, 'should have two arrows with heads' );
+    assert.equal( textArrow.length, 1, 'should have one arrow with a label' );
+    const lowerCoord = (path) => Math.max( ... path.map( (p) => p.y ) );
+    const textLowerCoord    = lowerCoord( textArrow[0].path );
+    const headedLowerCord1  = lowerCoord( headedArrows[0].path );
+    const headedLowerCord2  = lowerCoord( headedArrows[1].path );
+    assert.ok( headedLowerCord1 === textLowerCoord, 'headed arrows should start at non-headed line' );
+    assert.ok( headedLowerCord2 === textLowerCoord, 'headed arrows should start at non-headed line' );
 
   });
 

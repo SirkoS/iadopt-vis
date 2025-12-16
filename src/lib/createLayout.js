@@ -45,6 +45,20 @@ const ARROW_LABELS = {
  * @property {Array.<Text>}   texts           text elements of the box
  */
 
+/**
+ * @typedef Arrow one arrow to be rendered
+ *
+ * @property {boolean}        hideHead        hide arrow head
+ * @property {boolean}        rotate          rotate arrow label by 90 degree
+ * @property {string}         [text]          label of arrow
+ * @property {number}         x               left coordinate of label
+ * @property {number}         y               upper coordinate of label
+ * @property {string}         type            property this arrow belongs to
+ * @property {Array<object>}  path            path description
+ * @property {number}         path.x          x-coordinate of a point in the path
+ * @property {number}         path.y          y-coordinate of a point in the path
+ */
+
 
 /**
  * do the layout for a single Variable
@@ -262,7 +276,6 @@ export default function createLayout( data ) {
       const botConstraint = constraints.reduce( (bot, cur) => (bot.box.y > cur.box.y ? bot : cur), constraints[0] );
 
       // add the missing arrow bit
-      const maxY = botConstraint.box.y + botConstraint.box.height + Cfg.layout.entity.vertMarginTiny;
       arrow = {
         path: [
           {

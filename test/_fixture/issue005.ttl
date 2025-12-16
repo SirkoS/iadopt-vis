@@ -1,0 +1,56 @@
+@prefix iop: <https://w3id.org/iadopt/ont/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/bio/example/> .
+
+ex:issue005
+    a
+        iop:Variable ;
+    rdfs:label
+        "Issue 005" ;
+    rdfs:comment
+        """if components of a system have a different number of Constraints, the 'hasConstraint' arrow should still point to both""" ;
+    iop:hasObjectOfInterest
+        _:b0 ;
+    iop:hasProperty
+        ex:Prop ;
+    iop:hasConstraint
+        [ a iop:Constraint ;
+             rdfs:label "Constraint A I" ;
+             iop:constrains ex:PartA ;
+        ] ,
+        [ a iop:Constraint ;
+             rdfs:label "Constraint A II" ;
+             iop:constrains ex:PartA ;
+        ] ,
+        [ a iop:Constraint ;
+             rdfs:label "Constraint B I" ;
+             iop:constrains ex:PartB ;
+        ] .
+
+_:b0
+    a
+        iop:Entity ,
+        iop:AsymmetricSystem ;
+    iop:hasNumerator
+        ex:PartA ;
+    iop:hasDenominator
+        ex:PartB .
+
+ex:Prop
+    a
+        iop:Property ;
+    rdfs:label
+        "Prop" .
+
+ex:PartA
+    a
+        iop:Entity ;
+    rdfs:label
+        "System Part A" .
+
+ex:PartB
+    a
+        iop:Entity ;
+    rdfs:label
+        "System Part B" .
