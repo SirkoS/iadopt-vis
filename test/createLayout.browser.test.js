@@ -1,5 +1,6 @@
 import { assert, describe, test, inject } from 'vitest';
 
+import { Entity } from '../src/model/models.js';
 import extract from '../src/lib/extract.js';
 import createLayout from '../src/lib/createLayout.js';
 
@@ -8,7 +9,6 @@ describe( 'createLayout', async () => {
   const turtles = inject( 'ttl' );
 
   for await (const [ file, ttl ] of Object.entries( turtles ) ) {
-
     test( `creates layout for ${file}`, async () => {
 
       // parse and layout
@@ -34,8 +34,26 @@ describe( 'createLayout', async () => {
     }, 5_000 );
   }
 
+
+
+  test( 'shows no title, if a system is a blank node and has no label', async () => {
+
+    // parse and layout
+    const variables = await extract( turtles['test\\_fixture\\issue004.ttl'] );
+    const layout = await createLayout( variables[0] );
+
+    // assert
+    assert.isArray( layout.boxes, 'should contain a list of boxes' );
+    const system = layout.boxes.find( (el) => (el.comp instanceof Entity) && (el.comp.isSystem()) );
+    assert.deepEqual( system.texts.map( (el) => el.text ), [ 'AsymmetricSystem' ], 'should only contain the header but not title' );
+
+  });
+
 });
 
+
+
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Helper XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
 
 
 /**

@@ -309,13 +309,23 @@ function getBox( type, data, initialY ) {
   let startY = initialY + 1 * Cfg.layout.entity.header.height;
 
   // append label as header
-  const headerLines = layoutText({ text: data.getLabel(), startY, boxWidth, boxCenter })
-    .map( (line) => ({
-      ... line,
-      className: 'title',
-      link: data.isBlank() || data.getShortIri() ? undefined : data.getIri(),
-    }));
-  startY = headerLines[ headerLines.length - 1 ].y + Cfg.layout.lineHeight;
+  const headerLines = [];
+  if( !data.isBlank() || data.getLabel( true ) ) {
+
+    // add title
+    headerLines.push(
+      ... layoutText({ text: data.getLabel(), startY, boxWidth, boxCenter })
+        .map( (line) => ({
+          ... line,
+          className: 'title',
+          link: data.isBlank() || data.getShortIri() ? undefined : data.getIri(),
+        }))
+    );
+
+    // account for space
+    startY = headerLines[ headerLines.length - 1 ].y + Cfg.layout.lineHeight;
+
+  }
 
   // append separator between header and remaining description
   let descSeparator = startY;
@@ -326,7 +336,7 @@ function getBox( type, data, initialY ) {
     lines.push({
       x: boxCenter,
       y: startY,
-      text:       data.getShortIri(),
+      text:       data.isBlank() ? '' : data.getShortIri(),
       className:  'desc',
       link:       data.getIri(),
     });

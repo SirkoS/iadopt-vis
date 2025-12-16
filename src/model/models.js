@@ -174,9 +174,10 @@ export class Concept {
 
   /**
    *
-   * @returns {string}
+   * @param {boolean} [realLabel=true]    only use real labels and do not derive from IRI
+   * @returns {string|undefined}
    */
-  getLabel(){
+  getLabel( realLabel = true ){
 
     // preferred language
     for( const lang of Concept.#langPref ) {
@@ -189,6 +190,11 @@ export class Concept {
     let label = Object.values( this._label )[ 0 ];
     if( label ) {
       return label;
+    }
+
+    // stop here, if we only want real labels
+    if( realLabel ) {
+      return;
     }
 
     // extract from URL
