@@ -1,0 +1,22 @@
+@media print {
+
+  /* hide most of the page */
+  h1,
+  nav,
+  .tab-content,
+  button {
+    display: none !important;
+  }
+
+  /* SVG gets full size */
+  svg {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* set page size */
+  @page {
+    margin: 0;
+  }
+
+}

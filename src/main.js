@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../css/interface.css';
 import '../css/svg.css';
 import '../css/error.css';
+import '../css/print.css';
 
 import addEditor from './lib/addEditor.js';
 import triggerRedraw from './lib/triggerRedraw.js';

@@ -191,6 +191,15 @@ export default function draw( div, layout ) {
   div.innerHTML = '';
   div.appendChild( svg );
 
+  // set printing style sizes
+  let printStyle = document.querySelector( 'style[media="print"]' );
+  if( !printStyle ) {
+    printStyle = document.createElement( 'style' );
+    printStyle.setAttribute( 'media', 'print' );
+    document.head.append( printStyle );
+  }
+  printStyle.innerHTML = `@page { size: ${Cfg.layout.width}px ${height}px }`;
+
   return result;
 
 }
