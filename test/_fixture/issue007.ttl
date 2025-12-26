@@ -1,0 +1,28 @@
+@prefix iop: <https://w3id.org/iadopt/ont/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/bio/example/> .
+
+ex:issue007
+    a
+        iop:Variable ;
+    rdfs:label
+        "Issue 007" ;
+    rdfs:comment
+        """special characters like μ prevent PNG export.""" ;
+    iop:hasObjectOfInterest
+         ex:OoI ;
+    iop:hasProperty
+        ex:Prop  .
+
+ex:Prop
+    a
+        iop:Property ;
+    rdfs:label
+        "Prop" .
+
+ex:OoI
+    a
+        iop:Entity ;
+    rdfs:label
+        "OoI" .

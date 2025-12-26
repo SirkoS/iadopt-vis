@@ -54,20 +54,19 @@ export function getSVGBlob() {
  *
  * @returns {Promise<Blob>}
  */
-export function getPNGBlob() {
+export async function getPNGBlob() {
 
   // https://stackoverflow.com/a/74026755/1169798
+
+  // grab data URI
+  const dataUri = URL.createObjectURL( getSVGBlob() );
   const svg = document.querySelector( '#svg svg' );
-  let content = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + getPlainSVG();
-  content = content
-    .replace( '<svg', '<svg xmlns="http://www.w3.org/2000/svg"' )
-    .replace( '<defs>', `<defs><style>${SvgCss}</style>`);
-  const dataUri = 'data:image/svg+xml;charset=utf-8;base64,' + btoa( content );
   const img = document.createElement( 'img' );
 
+  // convert to PNG
   return new Promise( (resolve, reject) => {
 
-    img.onerror = reject;
+    img.onerror = (e) => reject( new Error( 'Failed to generate PNG', { cause: e } ) );
     img.onload = () => {
 
       try {
@@ -83,6 +82,7 @@ export function getPNGBlob() {
       }
 
     };
+
     img.src = dataUri;
 
   });
