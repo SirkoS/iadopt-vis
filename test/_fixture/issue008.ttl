@@ -1,0 +1,41 @@
+@prefix iop: <https://w3id.org/iadopt/ont/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/iadopt/challenge/> .
+
+ex:issue008
+    a
+        iop:Variable ;
+    rdfs:label
+        "Issue 008" ;
+    rdfs:comment "Keep information about blank note entities through a cycle of toJSONLD-parseJSONLD" ;
+    iop:hasObjectOfInterest _:b0 ;
+    iop:hasProperty
+        ex:Prop .
+
+_:bo
+    a
+        iop:Entity ,
+        iop:AsymmetricSystem ;
+    iop:hasNumerator
+        ex:PartA ;
+    iop:hasDenominator
+        ex:partB .
+
+ex:Prop
+    a
+        iop:Property ;
+    rdfs:label
+        "Prop" .
+
+ex:PartA
+    a
+        iop:Entity ;
+    rdfs:label
+        "Part A" .
+
+ex:PartB
+    a
+        iop:Entity ;
+    rdfs:label
+        "Part B" .

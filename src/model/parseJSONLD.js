@@ -1,4 +1,4 @@
-import { Concept, Constraint, Entity, Property, VALID_SYSTEM_PROPERTIES, Variable } from './models.js';
+import { Constraint, Entity, Property, VALID_SYSTEM_PROPERTIES, Variable } from './models.js';
 
 /**
  * @returns {Variable}
