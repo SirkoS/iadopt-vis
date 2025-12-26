@@ -123,16 +123,18 @@ export default function draw( div, layout ) {
     const titleTextsPositions = box.texts
       .filter( (l) => l.className == 'title' )
       .map( (el) => el.y );
-    const titleHeight = Math.max( ... titleTextsPositions ) - box.y - Cfg.layout.lineHeight;
 
     // title
-    container.appendChild( createElement( 'rect', {
-      x:      box.x,
-      y:      box.y + Cfg.layout.entity.header.height,
-      width:  box.width,
-      height: titleHeight,
-      class:  'title',
-    }) );
+    if( titleTextsPositions.length ) {
+      const titleHeight = Math.max( ... titleTextsPositions ) - box.y - Cfg.layout.lineHeight;
+      container.appendChild( createElement( 'rect', {
+        x:      box.x,
+        y:      box.y + Cfg.layout.entity.header.height,
+        width:  box.width,
+        height: titleHeight,
+        class:  'title',
+      }) );
+    }
 
     // --- wireframe ---
     container.appendChild( createElement( 'path', {

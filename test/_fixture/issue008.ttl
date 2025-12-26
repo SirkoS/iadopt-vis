@@ -9,11 +9,12 @@ ex:issue008
     rdfs:label
         "Issue 008" ;
     rdfs:comment "Keep information about blank note entities through a cycle of toJSONLD-parseJSONLD" ;
-    iop:hasObjectOfInterest _:b0 ;
+    iop:hasObjectOfInterest
+        _:b0 ;
     iop:hasProperty
         ex:Prop .
 
-_:bo
+_:b0
     a
         iop:Entity ,
         iop:AsymmetricSystem ;
