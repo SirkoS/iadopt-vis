@@ -478,7 +478,7 @@ function layoutConstraints(parent, result) {
   // shortcut
   const constraints = parent.getConstraints();
   if( !parent.isSystem() && (constraints.length < 1) ) {
-    return;
+    return parent.box.y + parent.box.height;
   }
 
   // set starting vertical value
@@ -502,12 +502,11 @@ function layoutConstraints(parent, result) {
     }
 
     // if any component had constraints, leave some more space
-    if( startY != newStartY ) {
+    if( newStartY && (startY != newStartY) ) {
       startY = newStartY += Cfg.layout.entity.vertMarginTiny;
     }
 
   }
-
 
   let first = true; // highlight first constraint in case we have multiple ones
   for( const constraint of constraints ) {

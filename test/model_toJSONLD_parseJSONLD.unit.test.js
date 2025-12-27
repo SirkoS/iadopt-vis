@@ -12,7 +12,7 @@ describe( 'toJSONLD / parseJSONLD', () => {
   const turtles = inject( 'ttl' );
 
 
-  test.only( 'keeps exact content through a cycle of toJSONLD and fromJSONLD', async function(){
+  test( 'keeps exact content through a cycle of toJSONLD and fromJSONLD', async function(){
 
     // get entities
     const result = await extract( turtles['test\\_fixture\\issue008.ttl'] );

@@ -1,0 +1,52 @@
+@prefix iop: <https://w3id.org/iadopt/ont/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix ex: <http://example.org/iadopt/challenge/> .
+@prefix iopp: <https://w3id.org/iadopt/pattern/> .
+@prefix patt: <http://example.org/iadopt/pattern> .
+
+ex:issue009
+    a
+        iop:Variable ;
+    rdfs:label
+        "Issue 009" ;
+    rdfs:comment "Constraints on systems should not cause layout-issues" ;
+    iop:hasObjectOfInterest
+        ex:OoI ;
+    iop:hasProperty
+        ex:Prop ;
+    iop:hasConstraint
+        [ a iop:Constraint ;
+             rdfs:label "Constraint on System" ;
+             iop:constrains ex:OoI ;
+        ] .
+
+ex:OoI
+    a
+        iop:Entity ,
+        iop:AsymmetricSystem ;
+    rdfs:label
+        "OoI" ;
+    iop:hasSource
+        ex:OoI_part1 ;
+    iop:hasTarget
+        ex:OoI_part2 .
+
+ex:Prop
+    a
+        iop:Property ;
+    rdfs:label
+        "Prop" .
+
+ex:OoI_part1
+    a
+        iop:Entity ;
+    rdfs:label
+        "Part A" .
+
+ex:OoI_part2
+    a
+        iop:Entity ;
+    rdfs:label
+        "Part B" .

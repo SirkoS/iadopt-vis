@@ -5,7 +5,7 @@ import extract from '../src/lib/extract.js';
 import createLayout from '../src/lib/createLayout.js';
 import { VALID_ASYMMETRIC_SYSTEM_PROPERTY_PAIRS, VALID_ASYMMETRIC_SYSTEM_PROPERTIES } from '../src/model/models.js';
 
-describe( 'createLayout', async () => {
+describe.only( 'createLayout', async () => {
 
   // get fixtures
   const turtles = inject( 'ttl' );
@@ -24,6 +24,18 @@ describe( 'createLayout', async () => {
 
       // make sure no boxes are overlapping
       for( const boxA of layout.boxes ) {
+
+        // all coordinates should be numbers
+        assert.isFinite( boxA.x, 'should have a number for x-coordinate' );
+        assert.isFinite( boxA.y, 'should have a number for y-coordinate' );
+        assert.isFinite( boxA.width, 'should have a number for width' );
+        assert.isFinite( boxA.height, 'should have a number for height' );
+        assert.isFinite( boxA.descSeparator, 'should have a number for descSeparator' );
+        for( const t of boxA.texts ){
+          assert.isFinite( t.x, 'should have a number for x-coordinate of all text' );
+          assert.isFinite( t.y, 'should have a number for y-coordinate of all text' );
+        }
+
         for( const boxB of layout.boxes ) {
 
           // skip self-references
