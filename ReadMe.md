@@ -1,7 +1,8 @@
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+
 # I-Adopt Visualizer
 
-WebApp to automagically visualize I-Adopt Variables.
+WebApp to edit and automagically visualize [I-Adopt Variables](https://w3id.org/iadopt/).
 
-## License
+Use from [github pages](https://sirkos.github.io/iadopt-vis/).
 
-Not yet licensed. If you need the code for something, please contact me directly for now.

@@ -1,7 +1,6 @@
 {
   "name": "iadopt-vis",
-  "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Visualize IAdopt Variables",
   "type": "module",
   "scripts": {
@@ -27,5 +26,6 @@
     "n3": "^1.26.0",
     "rdfxml-streaming-parser": "^3.2.0"
   },
-  "packageManager": "pnpm@10.26.2"
+  "packageManager": "pnpm@10.26.2",
+  "license": "CC BY 4.0"
 }
