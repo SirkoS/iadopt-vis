@@ -1,0 +1,40 @@
+@prefix iop: <https://w3id.org/iadopt/ont/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/iadopt/challenge/> .
+
+ex:issue010
+    a
+        iop:Variable ;
+    rdfs:label
+        "Issue 010" ;
+    rdfs:comment "Using blank nodes as Entities, Constraints should still be properly attributed" ;
+    iop:hasObjectOfInterest
+        _:b1 ;
+    iop:hasMatrix
+        _:b2 ;
+    iop:hasProperty
+        ex:Prop ;
+    iop:hasConstraint
+        [ a iop:Constraint ;
+             rdfs:label "Constraint on OoI" ;
+             iop:constrains _:b1 ;
+        ] .
+
+_:b1
+    a
+        iop:Entity ;
+    rdfs:label
+        "OoI" .
+
+_:b2
+    a
+        iop:Entity ;
+    rdfs:label
+        "Matrix" .
+
+ex:Prop
+    a
+        iop:Property ;
+    rdfs:label
+        "Prop" .

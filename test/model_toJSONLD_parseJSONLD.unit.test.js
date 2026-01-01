@@ -19,9 +19,11 @@ describe( 'toJSONLD / parseJSONLD', () => {
     assert.isArray( result, 'should return an array' );
     assert.equal( result.length, 1, 'should contain a single Variable' );
     const before = result[0];
+    assert.ok( before.getObjectOfInterest().isBlank(), 'should have a blank node OoI before' );
 
     // action
-    const after = parseJSONLD( toJSONLD( before ) );
+    const serialized = toJSONLD( before );
+    const after = parseJSONLD( serialized );
 
     // validation
     assert.equal( after.getLabel(), before.getLabel(), 'should keep the Variable label intact' );
@@ -35,6 +37,39 @@ describe( 'toJSONLD / parseJSONLD', () => {
     const afterProp = after.getProperty();
     assert.equal( afterProp.getLabel(), beforeProp.getLabel(),  'should keep the label of the Property' );
     assert.equal( afterProp.getIri(),   beforeProp.getIri(),    'should keep the IRI of the Property' );
+
+  });
+
+
+
+  test( 'can handle blank nodes in Entities', async function(){
+
+    // get entities
+    const result = await extract( turtles['test\\_fixture\\issue010.ttl'] );
+    assert.isArray( result, 'should return an array' );
+    assert.equal( result.length, 1, 'should contain a single Variable' );
+    const before = result[0];
+    assert.isOk( before.getObjectOfInterest().isBlank(),  'should have blank node OoI before' );
+    assert.isOk( before.getMatrix().isBlank(),            'should have blank node Matrix before' );
+    assert.equal( before.getObjectOfInterest().getConstraints().length, 1,  'should have a constraint on the OoI before' );
+    assert.equal( before.getMatrix().getConstraints().length, 0,            'should have no constraint on the OoI before' );
+
+    // action I: serializing
+    const serialized = toJSONLD( before );
+
+    // validation I
+    assert.isString( serialized['ooi']['@id'],    'should have some IRI for OoI in serialization' );
+    assert.isString( serialized['matrix']['@id'], 'should have some IRI for Matrix in serialization' );
+    assert.include( serialized['constraint'][0]['constrains'], serialized['ooi']['@id'], 'should have the constraint on the OoI in serialization' );
+
+    // action II: deserializing
+    const deserialized = parseJSONLD( serialized );
+
+    // validation II
+    assert.isOk( deserialized.getObjectOfInterest().isBlank(),  'should have blank node OoI after' );
+    assert.isOk( deserialized.getMatrix().isBlank(),            'should have blank node Matrix after' );
+    assert.equal( deserialized.getObjectOfInterest().getConstraints().length, 1,  'should have a constraint on the OoI after' );
+    assert.equal( deserialized.getMatrix().getConstraints().length, 0,            'should have no constraint on the OoI after' );
 
   });
 

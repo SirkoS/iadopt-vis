@@ -67,11 +67,12 @@ function parseConcept( data, Type, lookup ) {
 
   // basic structure
   const result = new Type({
-    iri: data['@id'],
-    label: data['label'],
-    comment: data['comment'],
+    iri:      data['@id'],
+    label:    data['label'],
+    comment:  data['comment'],
+    isBlank:  !('@id' in data) || data['@id'].startsWith( '_:' ),
   });
-  lookup[ result.getIri() ] = result;
+  lookup[ data['@id'] ] = result;
 
   // check for components
   for( const systemProp of VALID_SYSTEM_PROPERTIES ) {
