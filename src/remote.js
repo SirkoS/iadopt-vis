@@ -33,8 +33,11 @@ import '../css/error.css';
 
   if( data ) {
 
+    // check for an order set
+    const order = currentLocation.searchParams.has( 'order' ) && currentLocation.searchParams.get( 'order' );
+
     // create the layout
-    const layout = await createLayout( data );
+    const layout = order ? await createLayout( data, order ) : await createLayout( data );
 
     // get SVG container
     const container = document.querySelector( '#svg' );

@@ -64,10 +64,11 @@ const ARROW_LABELS = {
 
 /**
  * do the layout for a single Variable
- * @param   {Variable} data   Variable description
+ * @param   {Variable} data     Variable description
+ * @param   {string}   order    order of components
  * @returns {Layout}          computed layout
  */
-export default function createLayout( data ) {
+export default function createLayout( data, order = 'pomcs' ) {
 
   // prep result
   const result = {
@@ -89,13 +90,7 @@ export default function createLayout( data ) {
   startY += Cfg.layout.entity.vertMargin;
 
   // get elements to show in second row
-  const components = [
-    data.getObjectOfInterest(),
-    data.getMatrix(),
-    data.getStatisticalModifier(),
-    ... data.getContextObjects(),
-    data.getProperty()
-  ]. filter( (c) => c );
+  const components = getComponents( data, order );
 
   // calculate widths for each box
   calcBoxWidth( components );
@@ -573,4 +568,47 @@ function layoutConstraints(parent, result) {
 
   return startY;
 
+}
+
+
+
+/**
+ * return the list of components in the requested order
+ * @param   {Variable} data     Variable description
+ * @param   {string}   order    order of components
+ * @returns {Entity[]}
+ */
+function getComponents( data, order ) {
+
+  const result = [];
+  for( const l of order.toLowerCase() ) {
+    switch( l ) {
+
+      case 'c':
+        result.push( ... data.getContextObjects() );
+        break;
+
+      case 'm':
+        result.push( data.getMatrix() );
+        break;
+
+      case 'o':
+        result.push( data.getObjectOfInterest() );
+        break;
+
+      case 'p':
+        result.push( data.getProperty() );
+        break;
+
+      case 's':
+        result.push( data.getStatisticalModifier() );
+        break;
+
+      default:
+        throw new Error( `Unknown order modifier "${l}"` );
+
+    }
+  }
+
+  return result. filter( (c) => c );
 }

@@ -26,3 +26,73 @@ button {
   left: -100;
 }
 
+#order {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 0 1em;
+}
+
+kbd {
+  cursor: pointer;
+  margin: 0.5em;
+  background: transparent;
+  color: #fff;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  padding: 0.4em 0.5em;
+  letter-spacing: 0.2em;
+}
+
+.dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba( 0, 0, 0, 0.7 );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog .content {
+  background: #333;
+  border-radius: 5px;
+  padding: 1em 2em 0;
+  border: 1px solid #000;
+  filter: drop-shadow(5px 5px 5px #666);
+  text-align: left;
+}
+
+.dialog .content .helper {
+  font-size: 80%;
+  font-style: italic;
+}
+
+.dialog .action {
+  margin-top: 2em;
+  text-align: right;
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.concept {
+  width: 10em;
+  margin: 0.5em;
+  text-align: center;
+  color: #000;
+  filter: drop-shadow(3px 3px 3px #666);
+  cursor: move;
+  user-select: none;
+  border-radius: 3px;
+}
+
+.concept.property { background: var(--color-property-light);  border-color: var(--color-property-dark); }
+.concept.ooi {      background: var(--color-entity-light);    border-color: var(--color-entity-dark); }
+.concept.matrix {   background: var(--color-entity-light);    border-color: var(--color-entity-dark); }
+.concept.context {  background: var(--color-entity-light);    border-color: var(--color-entity-dark); }
+.concept.statmod {  background: var(--color-statmod-light);   border-color: var(--color-statmod-dark); }

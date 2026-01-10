@@ -14,11 +14,14 @@ export default async function triggerRedraw( variable ) {
     STATE.variable = variable;
   }
 
+  // get currently selected order
+  const order = document.querySelector('#order input').value;
+
   // get SVG container
   const svg = document.querySelector( '#svg' );
 
   // create the layout
-  const layout = await createLayout( STATE.variable );
+  const layout = await createLayout( STATE.variable, order );
 
   // draw it
   const comp2layout = await draw( svg, layout );

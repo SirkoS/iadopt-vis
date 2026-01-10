@@ -38,6 +38,10 @@ ex:someVar a iop:Variable ;
       a iop:Constraint ;
       rdfs:label "other constraint" ;
       iop:constrains ex:Matrix_SysB
+    ], [
+      a iop:Constraint ;
+      rdfs:label "one more constraint" ;
+      iop:constrains ex:StatMod
     ] ;
     iop:hasMatrix ex:Matrix ;
     iop:hasObjectOfInterest ex:OoI ;
@@ -72,6 +76,12 @@ ex:Matrix_SysB
           </textarea>
 
       </div>
+    </div>
+
+
+    <div id="order" title="Display order of components">
+      Order: <kbd>POMSC</kbd>
+      <input type="hidden" value="POMSC" />
     </div>
     <button id="visualize" class="btn btn-primary">Visualize!</button>
 
@@ -158,6 +168,25 @@ ex:Matrix_SysB
     </form>
   </div>
 
+  <div class="dialog orderDialog hidden">
+
+    <div class="content">
+      <h1>Select Order</h1>
+      <p class="helper">Drag&Drop fields into the desired order</p>
+
+      <div class="dropzone">
+        <div class="concept property" draggable="true" data-id="p">Property</div>
+        <div class="concept ooi"      draggable="true" data-id="o">ObjectOfInterest</div>
+        <div class="concept matrix"   draggable="true" data-id="m">Matrix</div>
+        <div class="concept context"  draggable="true" data-id="c">ContextObject</div>
+        <div class="concept statmod"  draggable="true" data-id="s">Statistical Modifier</div>
+      </div>
+
+      <div class="action">
+        <button class="btn btn-primary">Close</button>
+      </div>
+    </div>
+  </div>
   <script type="module" src="/src/main.js"></script>
 </body>
 

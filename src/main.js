@@ -97,9 +97,71 @@ document.querySelector( '#export' )
     } catch(e) {
       console.error(e);
     }
-
-
-
-
-
   });
+
+
+/* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ORDER XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX */
+
+document.querySelector( '#order kbd' )
+  .addEventListener( 'click', () => {
+    document.querySelector( '.orderDialog' ).classList.remove( 'hidden' );
+  });
+
+document.querySelector( '.orderDialog button' )
+  .addEventListener( 'click', () => {
+
+    // update selection
+    const order = Array.from( document.querySelectorAll( '.orderDialog .dropzone .concept' ) )
+      .map( (el) => el.dataset.id )
+      .join('')
+      .toUpperCase();
+    document.querySelector('#order kbd').innerHTML = order;
+    document.querySelector('#order input').value = order;
+
+    // trigger redraw
+    document.querySelector( '#visualize' ).click();
+
+    // close dialog
+    document.querySelector( '.orderDialog' ).classList.add( 'hidden' );
+  });
+
+// drag & drop
+let draggedItem;
+for( const el of document.querySelectorAll( '.orderDialog .concept' ) ) {
+  el.addEventListener( 'dragstart', dragStart );
+  el.addEventListener( 'dragover',  dragOver );
+  el.addEventListener( 'dragend',   dragEnd );
+}
+
+
+function dragEnd(e) {
+  // if( e.target.parentNode == draggedItem.parentNode ) {
+  //   console.log( e.target, draggedItem );
+  //   e.target.parentNode.insertBefore( draggedItem, e.target );
+  // }
+  draggedItem = null;
+}
+
+function dragOver(e) {
+  if (isBefore(draggedItem, e.target)) {
+    e.target.parentNode.insertBefore(draggedItem, e.target);
+  } else {
+    e.target.parentNode.insertBefore(draggedItem, e.target.nextSibling);
+  }
+}
+
+function dragStart(e) {
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', null);
+  draggedItem = e.target;
+}
+
+function isBefore(el1, el2) {
+  let cur;
+  if (el2.parentNode === el1.parentNode) {
+    for (cur = el1.previousSibling; cur; cur = cur.previousSibling) {
+      if (cur === el2) return true;
+    }
+  }
+  return false;
+}
