@@ -136,7 +136,7 @@ export default function createLayout( data, order = 'pomcs' ) {
                              + Cfg.layout.entity.vertMarginMedium;
 
           // add the box
-          box = getBox( 'Entity', sysComp, startY );
+          box = getBox( 'Entity', sysComp, startY, obj );
           result.boxes.push( box );
 
           // add the corresponding arrow
@@ -305,9 +305,10 @@ export default function createLayout( data, order = 'pomcs' ) {
  * @param   {string}    type        type of the box
  * @param   {Concept}   data        description
  * @param   {number}    initialY    starting y-coordinate for this level of boxes
+ * @param   {Concept}   [parent]    parent; used for SystemComponents
  * @returns {object}                layout data
  */
-function getBox( type, data, initialY ) {
+function getBox( type, data, initialY, parent ) {
 
   // center of the box as point of alignment for texts
   // default is based on entire width of visualization
@@ -367,6 +368,11 @@ function getBox( type, data, initialY ) {
     startY -= 0.5 * Cfg.layout.entity.header.height;
   }
 
+  // determine additional classnames
+  const className = parent
+    ? parent.getRole().toLocaleLowerCase()
+    : data.getRole().toLocaleLowerCase();
+
   // base entry for the box
   const box = {
     comp:           data,
@@ -375,7 +381,7 @@ function getBox( type, data, initialY ) {
     y:              initialY,
     height:         startY - initialY,
     descSeparator:  descSeparator,
-    className:      type.toLowerCase().replace( /[^a-z]*/gi, '' ),
+    className:      `${type.toLowerCase().replace( /[^a-z]*/gi, '' )} ${className}`,
     texts: [
       // box header (type)
       {

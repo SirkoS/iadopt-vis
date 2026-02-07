@@ -45,6 +45,10 @@ rect.title {
   --color-entity-light: #DAE8FC;
   --color-entity-dark:  #6C8EBF;
 
+  --color-ooi-main:     #a1c5f7;
+  --color-matrix-main:  #b8d3f9;
+  --color-context-main: #d0e2fb;
+
   --color-statmod-main:  #666666;
   --color-statmod-light: #DDDDDD;
   --color-statmod-dark:  #666666;
@@ -75,6 +79,15 @@ rect.title {
 .system rect.title   { fill:   var(--color-entity-main); }
 .entity .frame,
 .system .frame       { stroke: var(--color-entity-dark); }
+
+/* -------------- Entity Types --------------- */
+
+.entity.ooi           rect,
+.system.ooi           rect { fill: var(--color-ooi-main); }
+.entity.matrix        rect,
+.system.matrix        rect { fill: var(--color-matrix-main); }
+.entity.contextobject rect,
+.system.contextobject rect { fill: var(--color-context-main); }
 
 /* ---------- Statistical Modifier ----------- */
 

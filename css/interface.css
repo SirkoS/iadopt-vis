@@ -92,7 +92,7 @@ kbd {
 }
 
 .concept.property { background: var(--color-property-light);  border-color: var(--color-property-dark); }
-.concept.ooi {      background: var(--color-entity-light);    border-color: var(--color-entity-dark); }
-.concept.matrix {   background: var(--color-entity-light);    border-color: var(--color-entity-dark); }
-.concept.context {  background: var(--color-entity-light);    border-color: var(--color-entity-dark); }
+.concept.ooi {      background: var(--color-ooi-main);        border-color: var(--color-entity-dark); }
+.concept.matrix {   background: var(--color-matrix-main);     border-color: var(--color-entity-dark); }
+.concept.context {  background: var(--color-context-main);    border-color: var(--color-entity-dark); }
 .concept.statmod {  background: var(--color-statmod-light);   border-color: var(--color-statmod-dark); }

@@ -70,7 +70,9 @@ g:hover .menu {
 }
 .editor.constraint #editor-type { background-color: var(--color-constraint-main); color: #000; border-color: var(--color-constraint-dark); }
 .editor.comp       #editor-type { background-color: var(--color-entity-main);     color: #000; border-color: var(--color-entity-dark); }
-.editor.entity     #editor-type { background-color: var(--color-entity-main);     color: #000; border-color: var(--color-entity-dark); }
+.editor.ooi        #editor-type { background-color: var(--color-ooi-main);        color: #000; border-color: var(--color-entity-dark); }
+.editor.matrix     #editor-type { background-color: var(--color-matrix-main);     color: #000; border-color: var(--color-entity-dark); }
+.editor.context    #editor-type { background-color: var(--color-context-main);    color: #000; border-color: var(--color-entity-dark); }
 .editor.property   #editor-type { background-color: var(--color-property-main);   color: #000; border-color: var(--color-property-dark); }
 .editor.statmod    #editor-type { background-color: var(--color-statmod-main);    color: #000; border-color: var(--color-statmod-dark); }
 .editor.variable   #editor-type { background-color: var(--color-variable-main);   color: #fff; border-color: var(--color-variable-dark); }

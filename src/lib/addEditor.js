@@ -6,7 +6,7 @@ import { state as STATE } from './editor/state';
 import toTurtle from '../model/toTurtle';
 
 // type selector classes
-const TYPE_SELECT_CLASSES = [ 'comp', 'constraint', 'entity', 'property', 'statmod', 'variable' ];
+const TYPE_SELECT_CLASSES = [ 'comp', 'constraint', 'entity', 'ooi', 'matrix', 'context', 'property', 'statmod', 'variable' ];
 
 // shortcuts to form components
 const ELEMENTS = {
@@ -89,9 +89,13 @@ function updateTypeSelector() {
   let newClass;
   switch( ELEMENTS.editorType.value ) {
     case 'ContextObject':
+      newClass = 'context';
+      break;
     case 'Matrix':
+      newClass = 'matrix';
+      break;
     case 'OoI':
-      newClass = 'entity';
+      newClass = 'ooi';
       break;
     case 'SystemComponent':
       newClass = 'comp';
@@ -109,7 +113,7 @@ function updateTypeSelector() {
       newClass = 'variable';
       break;
   }
-
+  console.log( newClass );
   // remove old classes and append new one
   ELEMENTS.editor.classList.remove( ...TYPE_SELECT_CLASSES );
   ELEMENTS.editor.classList.add( newClass );
