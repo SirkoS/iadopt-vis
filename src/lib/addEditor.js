@@ -89,13 +89,13 @@ function updateTypeSelector() {
   let newClass;
   switch( ELEMENTS.editorType.value ) {
     case 'ContextObject':
-      newClass = 'context';
+      newClass = 'entity context';
       break;
     case 'Matrix':
-      newClass = 'matrix';
+      newClass = 'entity matrix';
       break;
     case 'OoI':
-      newClass = 'ooi';
+      newClass = 'entity ooi';
       break;
     case 'SystemComponent':
       newClass = 'comp';
@@ -113,10 +113,10 @@ function updateTypeSelector() {
       newClass = 'variable';
       break;
   }
-  console.log( newClass );
+
   // remove old classes and append new one
   ELEMENTS.editor.classList.remove( ...TYPE_SELECT_CLASSES );
-  ELEMENTS.editor.classList.add( newClass );
+  ELEMENTS.editor.classList.add( ... newClass.split( ' ' ) );
 
 }
 
