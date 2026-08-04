@@ -1,4 +1,5 @@
 import SvgCss  from '../../css/svg.css?raw';
+import toJSONLD from '../model/toJSONLD';
 import toTurtle from '../model/toTurtle';
 import { state } from './editor/state';
 
@@ -101,5 +102,20 @@ export function getTurtleBlob() {
 
   // done
   return new Blob([ttl], {type: 'text/turtle;charset=utf-8' });
+
+}
+
+
+
+/**
+ * export current variable to JSON-LD
+ */
+export function getJsonld() {
+
+  // get turtle representation of our variable
+  const jsonld = JSON.stringify( toJSONLD(state.variable), null, 2 );
+
+  // done
+  return new Blob([jsonld], {type: 'application/ld+json;charset=utf-8' });
 
 }

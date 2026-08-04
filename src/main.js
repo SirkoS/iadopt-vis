@@ -7,7 +7,7 @@ import '../css/print.css';
 import addEditor from './lib/addEditor.js';
 import triggerRedraw from './lib/triggerRedraw.js';
 import extract from './lib/extract.js';
-import { getSVGBlob, getPNGBlob, getTurtleBlob } from './lib/export.js';
+import { getSVGBlob, getPNGBlob, getTurtleBlob, getJsonld } from './lib/export.js';
 
 import { showError } from './ui/showError.js';
 
@@ -74,6 +74,11 @@ document.querySelector( '#export' )
         case 'ttl':
           blob = await getTurtleBlob();
           ext = 'ttl';
+          break;
+
+        case 'jsonld':
+          blob = await getJsonld();
+          ext = 'jsonld';
           break;
 
         default: throw Error( 'Unknown export format!' );

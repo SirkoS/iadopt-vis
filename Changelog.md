@@ -7,6 +7,7 @@
 
 ### Features
 * Allow to change display order of Variable components
+* Added option to export JSON-LD
 
 ### Changes
 * Use different hue for individual Entity types
