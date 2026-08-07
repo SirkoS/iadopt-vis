@@ -25,9 +25,9 @@ export default function toJSONLD( variable ) {
       '@type': [ 'https://w3id.org/iadopt/ont/Property' ],
     },
 
-    statisticalModifier:  serializeEntity( variable.getStatisticalModifier(), blankNodeMap ),
-    ooi:                  serializeEntity( variable.getObjectOfInterest(), blankNodeMap ),
-    matrix:               serializeEntity( variable.getMatrix(), blankNodeMap ),
+    statmod:  serializeEntity( variable.getStatisticalModifier(), blankNodeMap ),
+    ooi:      serializeEntity( variable.getObjectOfInterest(), blankNodeMap ),
+    matrix:   serializeEntity( variable.getMatrix(), blankNodeMap ),
 
     context: variable.getContextObjects()?.map( (ctx) => serializeEntity( ctx ) ),
     constraint: [],

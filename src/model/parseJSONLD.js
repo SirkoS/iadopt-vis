@@ -14,24 +14,34 @@ export default function parseJSONLD( data ) {
 
   // parse components
   const lookup = {};
-  let ent = parseConcept( data['property'], Property, lookup );
+  let item = data['property'];
+  let ent = parseConcept( item, Property, lookup );
   if (ent) {
     variable.setProperty( ent );
   }
-  ent = parseConcept( data['statisticalModifier'], Entity, lookup );
+  item = data['statmod'] ?? data['statisticalModifier'] ?? data['statMod'] ?? data['statisticalModifier'];
+  ent = parseConcept( item, Entity, lookup );
   if (ent) {
     variable.setStatisticalModifier( ent );
   }
-  ent = parseConcept( data['ooi'], Entity, lookup );
+  item = data['ooi'] ?? data['objectofinterest'];
+  ent = parseConcept( item, Entity, lookup );
   if (ent) {
     variable.setObjectOfInterest( ent );
   }
+  item = data['matrix'];
   ent = parseConcept( data['matrix'], Entity, lookup );
   if (ent) {
     variable.setMatrix( ent );
   }
-  if( data['context'] ) {
-    for( const d of data['context'] ) {
+  item = data['context'] ?? data['contextobject'];
+  if( item ) {
+    if( Array.isArray( item ) ) {
+      for( const d of data['context'] ) {
+        ent = parseConcept( d, Entity, lookup );
+        variable.addContextObject( ent );
+      }
+    } else {
       ent = parseConcept( d, Entity, lookup );
       variable.addContextObject( ent );
     }
