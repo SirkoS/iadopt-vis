@@ -14,7 +14,7 @@ describe( 'extract.getPNGBlob', async () => {
   const html = await server.commands.readFile( 'index.html' );
 
 
-  test.skip( 'should export PNG without issues', async function(){
+  test( 'should export PNG without issues', async function(){
     // skipped as playwright keeps on throwing some error without a message
 
     // render UI
@@ -28,7 +28,7 @@ describe( 'extract.getPNGBlob', async () => {
     assert.equal( result.length, 1, 'should contain a single Variable' );
     const variable = result[0];
     // render
-    triggerRedraw(variable);
+    await triggerRedraw(variable);
 
     // export to PNG
     await getPNGBlob();

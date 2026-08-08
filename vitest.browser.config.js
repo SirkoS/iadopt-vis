@@ -10,7 +10,7 @@ for await (const file of Fs.glob( '**/*.ttl' ) ) {
 
 export default defineConfig({
   test: {
-    projects:[
+    projects: [
 
       {
         test:{
@@ -45,7 +45,7 @@ export default defineConfig({
       },
 
     ],
-    provide:{
+    provide: {
       ttl: ttlFiles,
     }
   },
