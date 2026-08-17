@@ -232,7 +232,8 @@ export default function createLayout( data, order = 'pomcs' ) {
     // get overall left-most constraint
     const leftConstraint = constraints.reduce( (left, cur) => (left.box.x < cur.box.x ? left : cur), constraints[0] );
     // get overall bottom-most constraint
-    const botConstraint = constraints.reduce( (bot, cur) => (bot.box.y > cur.box.y ? bot : cur), constraints[0] );
+    // important is the lower end of the box
+    const botConstraint = constraints.reduce( (bot, cur) => (bot.box.y + bot.box.height > cur.box.y + cur.box.height ? bot : cur), constraints[0] );
 
     // add arrow start as a frame (includes label)
     const x = system.box.x + system.box.width + 0.5 * Cfg.layout.entity.horMargin;

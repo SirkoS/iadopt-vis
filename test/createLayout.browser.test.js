@@ -5,7 +5,7 @@ import extract from '../src/lib/extract.js';
 import createLayout from '../src/lib/createLayout.js';
 import { VALID_ASYMMETRIC_SYSTEM_PROPERTY_PAIRS, VALID_ASYMMETRIC_SYSTEM_PROPERTIES } from '../src/model/models.js';
 
-describe.only( 'createLayout', async () => {
+describe( 'createLayout', async () => {
 
   // get fixtures
   const turtles = inject( 'ttl' );
@@ -70,6 +70,17 @@ describe.only( 'createLayout', async () => {
 
         }
 
+      }
+
+      // hasConstraint arrows do not cross (constraint) boxes
+      // shortcut: arrow tips for hasConstraint arrows are pointing upwards
+      const hasConstraintArrowTips = layout.arrows.filter( (a) => (a.type == 'hasConstraint') && !a.hideHead && (a.path.length == 2));
+      for( const arrowTip of hasConstraintArrowTips ) {
+        // arrow tips are attached to a path's last two elements
+        // arrow is from second-to-last to last
+        // so, second-to-last y-value has to be larger than last y-value
+        // or both have to be equal (horizontal arrow)
+        assert.isAtLeast( arrowTip.path.at(-2).y, arrowTip.path.at(-1).y, 'should have hasConstraint arrow tips pointing upwards' );
       }
 
 

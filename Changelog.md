@@ -5,6 +5,7 @@
 ### Bugfixes
 * (De)serializing of blank node Entities with Constrains did not keep the proper link
 * align parsing and serializing JSON-LD with schema definition (but still allow old variants)
+* fix issue with hasConstraint arrow tips overlapping with Constraint boxes
 
 ### Features
 * Allow to change display order of Variable components
