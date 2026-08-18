@@ -8,6 +8,20 @@ svg {
   border-radius: 5px;
 }
 
+header {
+  margin-top: 1em;
+  position: relative;
+}
+header img {
+  position: absolute;
+  top: 1em;
+  left: 1em;
+  height: 3lh;
+}
+header h1 {
+  margin: 0 5em 0.5em;
+}
+
 textarea {
   width: 80%;
   height: 300px;
